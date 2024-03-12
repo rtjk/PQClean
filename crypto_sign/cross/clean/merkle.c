@@ -53,7 +53,7 @@
 static
 void setup_tree(uint16_t layer_offsets[LOG2(T)+1], 
                 uint16_t nodes_per_layer[LOG2(T)+1]) {
-    unsigned int depth, layer;
+    uint16_t depth, layer;
     int r_leaves;
     int subtree_found;
 
@@ -114,13 +114,13 @@ void setup_tree(uint16_t layer_offsets[LOG2(T)+1],
 static
 void get_leaf_indices(uint16_t merkle_leaf_indices[T], 
                       const uint16_t layer_offsets[LOG2(T)+1]) {
-    unsigned int r_leaves;
-    unsigned int idx_ctr = 0;
+    uint16_t r_leaves;
+    uint16_t idx_ctr = 0;
 
     /* r_node: current root node of next subtree, will always be right-child of previous root */
     /* l_node: traverses from current root node to left-childs until depth of subtree is found */
-    unsigned int r_node, l_node;
-    unsigned int layer, depth, subtree_found;
+    uint16_t r_node, l_node;
+    uint16_t layer, depth, subtree_found;
 
     /* If tree is already balanced, simply copy leaves to corresponding position */
     if (T == (1UL << LOG2(T))) {
@@ -172,7 +172,7 @@ void generate_merkle_tree(unsigned char merkle_tree[NUM_NODES_MERKLE_TREE *
                           unsigned char commitments[T][HASH_DIGEST_LENGTH])
 {
     size_t i;
-    unsigned int node_ctr, parent_layer;
+    uint16_t node_ctr, parent_layer;
 
     uint16_t merkle_leaf_indices[T];
     uint16_t layer_offsets[LOG2(T)+1];
@@ -216,7 +216,7 @@ void generate_merkle_proof(uint16_t merkle_proof_indices[TREE_NODES_TO_STORE],
                            const unsigned char challenge[T])
 {
     unsigned char flag_tree[NUM_NODES_MERKLE_TREE] = {NOT_COMPUTED};
-    unsigned int node_ctr, parent_layer;
+    uint16_t node_ctr, parent_layer;
     size_t i;
 
     uint16_t layer_offsets[LOG2(T)+1];
@@ -284,7 +284,7 @@ void rebuild_merkle_tree(unsigned char merkle_tree[NUM_NODES_MERKLE_TREE * HASH_
     uint16_t nodes_per_layer[LOG2(T)+1];
 
     uint16_t ctr;
-    unsigned int node_ctr, parent_layer;
+    uint16_t node_ctr, parent_layer;
     size_t i;
 
     /* Input consists of hash digests stored at child nodes and the index of the parent node for domain separation */
