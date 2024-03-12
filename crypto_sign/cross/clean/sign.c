@@ -44,8 +44,8 @@ int crypto_sign_keypair(unsigned char *pk,
 /*... from original message m[0],m[1],...,m[mlen-1]                           */
 /*... under secret key sk[0],sk[1],...                                        */
 int crypto_sign(unsigned char *sm,
-                unsigned long long *smlen,     // out parameter
-                const unsigned char *m, unsigned long long mlen,  // in parameter
+                uint64_t *smlen,     // out parameter
+                const unsigned char *m, uint64_t mlen,  // in parameter
                 const unsigned char *sk)                          // in parameter
 {
    /* sign cannot fail */
@@ -53,7 +53,7 @@ int crypto_sign(unsigned char *sm,
    CROSS_sign((const prikey_t *) sk,                               // in parameter
              (const char *const) m, (const uint64_t) mlen,         // in parameter
              (sig_t *) (sm+mlen));                                 // out parameter
-   *smlen = mlen + (unsigned long long) sizeof(sig_t);
+   *smlen = mlen + (uint64_t) sizeof(sig_t);
 
    return 0;  // NIST convention: 0 == zero errors
 } // end crypto_sign
@@ -64,13 +64,13 @@ int crypto_sign(unsigned char *sm,
 /*.  ... under public key pk[0],pk[1],...                                     */
 /*.  ... and producing original message m[0],m[1],...,m[*mlen-1]              */
 int crypto_sign_open(unsigned char *m,
-                     unsigned long long *mlen,        // out parameter
-                     const unsigned char *sm, unsigned long long smlen, // in parameter
+                     uint64_t *mlen,        // out parameter
+                     const unsigned char *sm, uint64_t smlen, // in parameter
                      const unsigned char *pk)                           // in parameter
 {
 
    /* verify returns 1 if signature is ok, 0 otherwise */
-   *mlen = smlen-(unsigned long long) sizeof(sig_t);
+   *mlen = smlen-(uint64_t) sizeof(sig_t);
    
    memcpy((unsigned char *) m, (const unsigned char *) sm, (size_t) *mlen);
    int ok = CROSS_verify((const pubkey_t *const)

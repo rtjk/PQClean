@@ -49,15 +49,15 @@ int crypto_sign_keypair(unsigned char *pk,
                        );
 
 int crypto_sign(unsigned char *sm,
-                unsigned long long *smlen,
+                uint64_t *smlen,
                 const unsigned char *m,
-                unsigned long long mlen,
+                uint64_t mlen,
                 const unsigned char *sk
                );
 
 int crypto_sign_open(unsigned char *m,
-                     unsigned long long *mlen,
+                     uint64_t *mlen,
                      const unsigned char *sm,
-                     unsigned long long smlen,
+                     uint64_t smlen,
                      const unsigned char *pk
                     );

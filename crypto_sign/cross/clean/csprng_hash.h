@@ -44,7 +44,7 @@ void initialize_csprng(CSPRNG_STATE_T * const csprng_state,
 /* extracts xlen bytes from the CSPRNG, given the state */
 static inline
 void csprng_randombytes(unsigned char * const x,
-                        unsigned long long xlen,
+                        uint64_t xlen,
                         CSPRNG_STATE_T * const csprng_state){
    xof_shake_extract(csprng_state,x,xlen);
 }
@@ -56,7 +56,7 @@ extern CSPRNG_STATE_T platform_csprng_state;
 /* extracts xlen bytes from the global CSPRNG */
 static inline
 void randombytes(unsigned char * x,
-                 unsigned long long xlen) {
+                 uint64_t xlen) {
    csprng_randombytes(x,xlen,&platform_csprng_state);
 }
 
