@@ -1,0 +1,15 @@
+name: Cross
+type: signature
+claimed-nist-level: 1
+length-public-key: 61
+length-secret-key: 16
+length-signature: 48938 # TODO: always use largest signature size
+nistkat-sha256: 91f104dac2e0e4704c056a86ef94dc8f561a906f2ded933df710b05beb94fbb8 # sha256sum PQCsignKAT_77_12912.rsp
+testvectors-sha256: # TODO: run "bin/testvectors_scheme_implementation | sha256sum" when the scheme is first imported to PQClean
+principal-submitters:
+  - # TODO: add principal-submitters
+auxiliary-submitters: # optional
+  - # TODO: add auxiliary-submitters
+implementations: # TODO: add optimized implementation
+  - name: clean
+    version: 1.2
