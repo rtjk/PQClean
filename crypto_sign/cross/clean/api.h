@@ -26,22 +26,23 @@
 
 #pragma once
 
-#include "parameters.h"
-#include "CROSS.h"
+#include <stdint.h>
 
 #define CRYPTO_ALGNAME "CROSS"
 
+// TODO: CRYPTO_SECRETKEYBYTES, CRYPTO_PUBLICKEYBYTES, CRYPTO_BYTES, CRYPTO_RANDOMBYTES
+
 /*  no. of bytes of the secret key */
-#define CRYPTO_SECRETKEYBYTES (sizeof(prikey_t))
+#define CRYPTO_SECRETKEYBYTES 32
 
 /*  no. of bytes of the public key */
-#define CRYPTO_PUBLICKEYBYTES (sizeof(pubkey_t))
+#define CRYPTO_PUBLICKEYBYTES 77
 
 /* no. of bytes of overhead in a signed message */
-#define CRYPTO_BYTES (sizeof(sig_t))
+#define CRYPTO_BYTES 12912
 
 /* required bytes of input randomness */
-#define  CRYPTO_RANDOMBYTES (SEED_LENGTH_BYTES) //CROSS library -  parameters.h
+#define  CRYPTO_RANDOMBYTES 16 //CROSS library -  parameters.h
 
 
 int crypto_sign_keypair(unsigned char *pk,
