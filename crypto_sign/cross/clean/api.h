@@ -28,49 +28,49 @@
 
 #include <stdint.h>
 
-#define CRYPTO_ALGNAME "CROSS"
+#define PQCLEAN_CROSS_CLEAN_CRYPTO_ALGNAME "CROSS"
 
 // TODO: CRYPTO_SECRETKEYBYTES, CRYPTO_PUBLICKEYBYTES, CRYPTO_BYTES, CRYPTO_RANDOMBYTES
 
 /*  no. of bytes of the secret key */
-#define CRYPTO_SECRETKEYBYTES 32
+#define PQCLEAN_CROSS_CLEAN_CRYPTO_SECRETKEYBYTES 32
 
 /*  no. of bytes of the public key */
-#define CRYPTO_PUBLICKEYBYTES 77
+#define PQCLEAN_CROSS_CLEAN_CRYPTO_PUBLICKEYBYTES 77
 
 /* no. of bytes of overhead in a signed message */
-#define CRYPTO_BYTES 12912
+#define PQCLEAN_CROSS_CLEAN_CRYPTO_BYTES 12912
 
 /* required bytes of input randomness */
-#define  CRYPTO_RANDOMBYTES 16 //CROSS library -  parameters.h
+#define PQCLEAN_CROSS_CLEAN_CRYPTO_RANDOMBYTES 16 //CROSS library -  parameters.h
 
 
-int crypto_sign_keypair(unsigned char *pk,
+int PQCLEAN_CROSS_CLEAN_crypto_sign_keypair(unsigned char *pk,
                         unsigned char *sk
                        );
 
-int crypto_sign(unsigned char *sm,
+int PQCLEAN_CROSS_CLEAN_crypto_sign(unsigned char *sm,
                 uint64_t *smlen,
                 const unsigned char *m,
                 uint64_t mlen,
                 const unsigned char *sk
                );
 
-int crypto_sign_open(unsigned char *m,
+int PQCLEAN_CROSS_CLEAN_crypto_sign_open(unsigned char *m,
                      uint64_t *mlen,
                      const unsigned char *sm,
                      uint64_t smlen,
                      const unsigned char *pk
                     );
 
-int crypto_sign_signature(unsigned char *sig,
+int PQCLEAN_CROSS_CLEAN_crypto_sign_signature(unsigned char *sig,
                 uint64_t *siglen,
                 const unsigned char *m,
                 uint64_t mlen,
                 const unsigned char *sk
                );
 
-int crypto_sign_verify(const unsigned char *sig,
+int PQCLEAN_CROSS_CLEAN_crypto_sign_verify(const unsigned char *sig,
                 uint64_t *siglen,
                 const unsigned char *m,
                 uint64_t mlen,
