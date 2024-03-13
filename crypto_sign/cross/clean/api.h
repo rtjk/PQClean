@@ -61,3 +61,18 @@ int crypto_sign_open(unsigned char *m,
                      uint64_t smlen,
                      const unsigned char *pk
                     );
+
+int crypto_sign_signature(unsigned char *sig,
+                uint64_t *siglen,
+                const unsigned char *m,
+                uint64_t mlen,
+                const unsigned char *sk
+               );
+
+int crypto_sign_verify(const unsigned char *sig,
+                uint64_t *siglen,
+                const unsigned char *m,
+                uint64_t mlen,
+                const unsigned char *pk
+               );
+

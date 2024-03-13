@@ -83,3 +83,42 @@ int crypto_sign_open(unsigned char *m,
 } // end crypto_sign_open
 
 /*----------------------------------------------------------------------------*/
+/*                                                                            */
+/*... generating a signature sig[0],sig[1],...,sig[*siglen-1]                */
+/*... from original message m[0],m[1],...,m[mlen-1]                           */
+/*... under secret key sk[0],sk[1],...                                        */
+int crypto_sign_signature(unsigned char *sig, uint64_t *siglen,         // out parameter
+                const unsigned char *m, uint64_t mlen,                  // in parameter
+                const unsigned char *sk                                 // in parameter
+               )
+{
+   /* sign cannot fail */
+   CROSS_sign((const prikey_t *) sk,                                    // in parameter
+             (const char *const) m, (const uint64_t) mlen,              // in parameter
+             (sig_t *) sig);                                            // out parameter
+   *siglen = (uint64_t) sizeof(sig_t);
+
+   return 0;  // NIST convention: 0 == zero errors
+} // end crypto_sign_signature
+
+/*----------------------------------------------------------------------------*/
+/*                                                                            */
+/*.  ... verifying a signature sig[0],sig[1],...,sig[siglen-1]               */
+/*.  ... under public key pk[0],pk[1],...                                     */
+/*.  ... and producing original message m[0],m[1],...,m[*mlen-1]              */
+int crypto_sign_verify(const unsigned char *sig, uint64_t *siglen,      // in parameter
+                const unsigned char *m, uint64_t mlen,                  // in parameter
+                const unsigned char *pk                                 // in parameter
+               )
+{
+
+   /* verify returns 1 if signature is ok, 0 otherwise */   
+   int ok = CROSS_verify((const pubkey_t *const) pk,                     // in parameter
+                        (const char *const) m, (const uint64_t) mlen,    // in parameter
+                        (const sig_t * const) sig);                      // in parameter
+
+
+   return ok-1; // NIST convention: 0 == zero errors, -1 == error condition
+} // end crypto_sign_verify
+
+/*----------------------------------------------------------------------------*/
