@@ -6,19 +6,8 @@ HEADERS = api.h CROSS.h csprng_hash.h fq_arith.h keccakf1600.h merkle.h merkle_t
 OBJECTS = CROSS.o csprng_hash.o keccakf1600.o merkle.o pack_unpack.o seedtree.o sign.o
 
 # TODO: flags
-CFLAGS=
--I../../../common $(EXTRAFLAGS)
--std=c99 
--Wall 
--Wextra 
--Wpedantic 
--Werror 
--Wmissing-prototypes 
--Wredundant-decls 
--Wuninitialized 
--march=native 
--O3
--g3
+#CFLAGS=-I../../../common $(EXTRAFLAGS) -std=c99 -Wall -Wextra -Wpedantic -Werror -Wmissing-prototypes -Wredundant-decls -Wuninitialized -march=native -O3 -g3
+CFLAGS=-O3 -std=c99 -I../../../common $(EXTRAFLAGS)
 
 all: $(LIB)
 
