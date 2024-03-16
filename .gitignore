@@ -12,4 +12,6 @@ bin/
 __pycache__
 testcases/
 
-test-cross/
+crypto_sign/cross/test-cross/
+crypto_sign/cross/clean/fips202.c
+crypto_sign/cross/clean/fips202.h
