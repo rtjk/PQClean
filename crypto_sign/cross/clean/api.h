@@ -33,16 +33,16 @@
 // TODO: CRYPTO_SECRETKEYBYTES, CRYPTO_PUBLICKEYBYTES, CRYPTO_BYTES, CRYPTO_RANDOMBYTES
 
 /*  no. of bytes of the secret key */
-#define PQCLEAN_CROSS_CLEAN_CRYPTO_SECRETKEYBYTES 32
+#define PQCLEAN_CROSS_CLEAN_CRYPTO_SECRETKEYBYTES 32L
 
 /*  no. of bytes of the public key */
-#define PQCLEAN_CROSS_CLEAN_CRYPTO_PUBLICKEYBYTES 77
+#define PQCLEAN_CROSS_CLEAN_CRYPTO_PUBLICKEYBYTES 77L
 
 /* no. of bytes of overhead in a signed message */
-#define PQCLEAN_CROSS_CLEAN_CRYPTO_BYTES 12912
+#define PQCLEAN_CROSS_CLEAN_CRYPTO_BYTES 12912L
 
 /* required bytes of input randomness */
-#define PQCLEAN_CROSS_CLEAN_CRYPTO_RANDOMBYTES 16 //CROSS library -  parameters.h
+#define PQCLEAN_CROSS_CLEAN_CRYPTO_RANDOMBYTES 16L //CROSS library -  parameters.h
 
 
 int PQCLEAN_CROSS_CLEAN_crypto_sign_keypair(unsigned char *pk,
