@@ -99,6 +99,7 @@ def run_subprocess(command, working_dir='.', env=None, expected_returncode=0,
     Helper function to run a shell command and report success/failure
     depending on the exit status of the shell command.
     """
+    print('**** helpers.py command ****', command)
     env_ = os.environ.copy()
     env_["LANG"] = "C"
     if env is not None:
@@ -119,6 +120,7 @@ def run_subprocess(command, working_dir='.', env=None, expected_returncode=0,
     if print_output:
         print(result.stdout.decode('utf-8'))
     if expected_returncode is not None:
+        print('**** helpers.py compare ****', expected_returncode, result.returncode)
         assert result.returncode == expected_returncode, \
             "Got unexpected return code {}".format(result.returncode)
     else:
