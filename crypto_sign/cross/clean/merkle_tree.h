@@ -101,6 +101,8 @@ uint16_t PQCLEAN_CROSS_CLEAN_merkle_tree_proof_compute(uint8_t mtp[HASH_DIGEST_L
     uint16_t mtp_len; 
     uint16_t merkle_proof_indices[TREE_NODES_TO_STORE];
 
+    if(leaves == NULL) {leaves = NULL;}; // TODO: useless line added to avoid -Werror=unused-parameter and Werror=unused-value
+
     PQCLEAN_CROSS_CLEAN_generate_merkle_proof(merkle_proof_indices, &mtp_len, leaves_to_reveal);
 
     for (size_t i=0; i< mtp_len; i++) {

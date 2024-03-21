@@ -108,7 +108,7 @@ int PQCLEAN_CROSS_CLEAN_crypto_sign_signature(unsigned char *sig, uint64_t *sigl
 /*.  ... verifying a signature sig[0],sig[1],...,sig[siglen-1]               */
 /*.  ... under public key pk[0],pk[1],...                                     */
 /*.  ... and producing original message m[0],m[1],...,m[*mlen-1]              */
-int PQCLEAN_CROSS_CLEAN_crypto_sign_verify(const unsigned char *sig, uint64_t *siglen,      // in parameter
+int PQCLEAN_CROSS_CLEAN_crypto_sign_verify(const unsigned char *sig, uint64_t siglen,      // in parameter
                 const unsigned char *m, uint64_t mlen,                  // in parameter
                 const unsigned char *pk                                 // in parameter
                )

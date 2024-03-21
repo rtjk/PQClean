@@ -23,6 +23,8 @@
  *
  **/
 
+#ifndef PQCLEAN_CROSS_CLEAN_API_H
+#define PQCLEAN_CROSS_CLEAN_API_H
 
 #pragma once
 
@@ -39,7 +41,7 @@
 #define PQCLEAN_CROSS_CLEAN_CRYPTO_PUBLICKEYBYTES 77L
 
 /* no. of bytes of overhead in a signed message */
-#define PQCLEAN_CROSS_CLEAN_CRYPTO_BYTES 12912L
+#define PQCLEAN_CROSS_CLEAN_CRYPTO_BYTES 12912L //19056L
 
 /* required bytes of input randomness */
 #define PQCLEAN_CROSS_CLEAN_CRYPTO_RANDOMBYTES 16L //CROSS library -  parameters.h
@@ -71,9 +73,10 @@ int PQCLEAN_CROSS_CLEAN_crypto_sign_signature(unsigned char *sig,
                );
 
 int PQCLEAN_CROSS_CLEAN_crypto_sign_verify(const unsigned char *sig,
-                uint64_t *siglen,
+                uint64_t siglen,
                 const unsigned char *m,
                 uint64_t mlen,
                 const unsigned char *pk
                );
 
+#endif
