@@ -30,9 +30,9 @@
 
 #include <stdint.h>
 
-#define PQCLEAN_CROSS_CLEAN_CRYPTO_ALGNAME "CROSS"
+// TODO: CRYPTO_ALGNAME, CRYPTO_SECRETKEYBYTES, CRYPTO_PUBLICKEYBYTES, CRYPTO_BYTES, CRYPTO_RANDOMBYTES
 
-// TODO: CRYPTO_SECRETKEYBYTES, CRYPTO_PUBLICKEYBYTES, CRYPTO_BYTES, CRYPTO_RANDOMBYTES
+#define PQCLEAN_CROSS_CLEAN_CRYPTO_ALGNAME "CROSS"
 
 /*  no. of bytes of the secret key */
 #define PQCLEAN_CROSS_CLEAN_CRYPTO_SECRETKEYBYTES 32L
@@ -44,7 +44,7 @@
 #define PQCLEAN_CROSS_CLEAN_CRYPTO_BYTES 12912L //19056L
 
 /* required bytes of input randomness */
-#define PQCLEAN_CROSS_CLEAN_CRYPTO_RANDOMBYTES 16L //CROSS library -  parameters.h
+#define PQCLEAN_CROSS_CLEAN_CRYPTO_RANDOMBYTES 16 //CROSS library -  parameters.h
 
 
 int PQCLEAN_CROSS_CLEAN_crypto_sign_keypair(unsigned char *pk,
@@ -78,5 +78,20 @@ int PQCLEAN_CROSS_CLEAN_crypto_sign_verify(const unsigned char *sig,
                 uint64_t mlen,
                 const unsigned char *pk
                );
+
+/* #include <stddef.h>
+int PQCLEAN_DILITHIUM2_CLEAN_crypto_sign_keypair(uint8_t *pk, uint8_t *sk);
+int PQCLEAN_DILITHIUM2_CLEAN_crypto_sign_signature(uint8_t *sig, size_t *siglen,
+        const uint8_t *m, size_t mlen,
+        const uint8_t *sk);
+int PQCLEAN_DILITHIUM2_CLEAN_crypto_sign(uint8_t *sm, size_t *smlen,
+        const uint8_t *m, size_t mlen,
+        const uint8_t *sk);
+int PQCLEAN_DILITHIUM2_CLEAN_crypto_sign_verify(const uint8_t *sig, size_t siglen,
+        const uint8_t *m, size_t mlen,
+        const uint8_t *pk);
+int PQCLEAN_DILITHIUM2_CLEAN_crypto_sign_open(uint8_t *m, size_t *mlen,
+        const uint8_t *sm, size_t smlen,
+        const uint8_t *pk); */
 
 #endif
