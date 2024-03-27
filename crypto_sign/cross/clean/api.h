@@ -23,10 +23,10 @@
  *
  **/
 
+#pragma once
+
 #ifndef PQCLEAN_CROSS_CLEAN_API_H
 #define PQCLEAN_CROSS_CLEAN_API_H
-
-#pragma once
 
 #include <stdint.h>
 

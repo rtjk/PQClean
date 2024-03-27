@@ -25,6 +25,8 @@
  *
  **/
 
+#pragma once
+
 #include "csprng_hash.h"
 #if defined(NO_TREES)
 
