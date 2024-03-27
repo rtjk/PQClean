@@ -53,7 +53,7 @@
 static
 void setup_tree(uint16_t layer_offsets[LOG2(T)+1], 
                 uint16_t nodes_per_layer[LOG2(T)+1]) {
-    uint16_t depth, layer;
+    uint32_t depth, layer;
     int r_leaves;
     int subtree_found;
 
@@ -114,13 +114,13 @@ void setup_tree(uint16_t layer_offsets[LOG2(T)+1],
 static
 void get_leaf_indices(uint16_t merkle_leaf_indices[T], 
                       const uint16_t layer_offsets[LOG2(T)+1]) {
-    uint16_t r_leaves;
-    uint16_t idx_ctr = 0;
+    uint32_t r_leaves;
+    uint32_t idx_ctr = 0;
 
     /* r_node: current root node of next subtree, will always be right-child of previous root */
     /* l_node: traverses from current root node to left-childs until depth of subtree is found */
-    uint16_t r_node, l_node;
-    uint16_t layer, depth, subtree_found;
+    uint32_t r_node, l_node;
+    uint32_t layer, depth, subtree_found;
 
     /* If tree is already balanced, simply copy leaves to corresponding position */
     if (T == (1UL << LOG2(T))) {
@@ -172,7 +172,7 @@ void PQCLEAN_CROSS_CLEAN_generate_merkle_tree(unsigned char merkle_tree[NUM_NODE
                           unsigned char commitments[T][HASH_DIGEST_LENGTH])
 {
     size_t i;
-    uint16_t node_ctr, parent_layer;
+    uint32_t node_ctr, parent_layer;
 
     uint16_t merkle_leaf_indices[T];
     uint16_t layer_offsets[LOG2(T)+1];
@@ -216,7 +216,7 @@ void PQCLEAN_CROSS_CLEAN_generate_merkle_proof(uint16_t merkle_proof_indices[TRE
                            const unsigned char challenge[T])
 {
     unsigned char flag_tree[NUM_NODES_MERKLE_TREE] = {NOT_COMPUTED};
-    uint16_t node_ctr, parent_layer;
+    uint32_t node_ctr, parent_layer;
     size_t i;
 
     uint16_t layer_offsets[LOG2(T)+1];
@@ -284,7 +284,7 @@ void PQCLEAN_CROSS_CLEAN_rebuild_merkle_tree(unsigned char merkle_tree[NUM_NODES
     uint16_t nodes_per_layer[LOG2(T)+1];
 
     uint16_t ctr;
-    uint16_t node_ctr, parent_layer;
+    uint32_t node_ctr, parent_layer;
     size_t i;
 
     /* Input consists of hash digests stored at child nodes and the index of the parent node for domain separation */

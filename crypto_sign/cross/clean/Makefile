@@ -17,8 +17,8 @@ OBJECTS = CROSS.o csprng_hash.o keccakf1600.o merkle.o pack_unpack.o seedtree.o 
 #CFALGS= -I../../../common $(EXTRAFLAGS)
 
 #### incrementally add flags
-# -Wall -Wuninitialized -Wextra
-CFLAGS=-std=c99 -I../../../common $(EXTRAFLAGS) -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes
+# 
+CFLAGS=-std=c99 -I../../../common $(EXTRAFLAGS) -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra
 
 
 all: $(LIB)
