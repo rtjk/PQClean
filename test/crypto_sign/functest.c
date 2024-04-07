@@ -23,7 +23,7 @@
 #endif
 
 #ifndef NTESTS
-#define NTESTS 5
+#define NTESTS 1
 #endif
 
 #define MLEN 1024

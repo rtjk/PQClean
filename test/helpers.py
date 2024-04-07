@@ -20,8 +20,8 @@ def cleanup_testcases():
     """Clean up any remaining isolated test dirs"""
     print("Cleaning up testcases directory",
           file=sys.stderr)
-    for dir_ in TEST_TEMPDIRS:
-        shutil.rmtree(dir_, ignore_errors=True)
+"""     for dir_ in TEST_TEMPDIRS:
+        shutil.rmtree(dir_, ignore_errors=True) """
 
 
 TEST_TEMPDIRS = []
@@ -79,7 +79,7 @@ def isolate_test_files(impl_path, test_prefix,
 
     def destructor():
         """Clean up the isolated files"""
-        shutil.rmtree(test_dir, ignore_errors=True)
+        """ shutil.rmtree(test_dir, ignore_errors=True) """
 
     return (test_dir, new_impl_dir, initializer, destructor)
 
