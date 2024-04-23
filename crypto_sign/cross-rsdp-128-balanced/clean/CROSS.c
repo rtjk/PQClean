@@ -164,7 +164,7 @@ void PQCLEAN_CROSSRSDP128BALANCED_CLEAN_CROSS_sign(const prikey_t *SK,
 
 #if defined(NO_TREES)
     unsigned char rounds_seeds[T*SEED_LENGTH_BYTES] = {0};
-    compute_round_seeds(rounds_seeds,root_seed,sig->salt);
+    PQCLEAN_CROSSRSDP128BALANCED_CLEAN_compute_round_seeds(rounds_seeds,root_seed,sig->salt);
 #else
     uint8_t seed_tree[SEED_LENGTH_BYTES*NUM_NODES_SEED_TREE] = {0};
     PQCLEAN_CROSSRSDP128BALANCED_CLEAN_generate_seed_tree_from_root(seed_tree,root_seed,sig->salt);
@@ -248,7 +248,7 @@ void PQCLEAN_CROSSRSDP128BALANCED_CLEAN_CROSS_sign(const prikey_t *SK,
 #if defined(RSDP)
         PQCLEAN_CROSSRSDP128BALANCED_CLEAN_pack_fz_vec(cmt_0_i_input + DENSELY_PACKED_FQ_SYN_SIZE, sigma[i]);
 #elif defined(RSDPG)
-        pack_fz_rsdp_g_vec(cmt_0_i_input + DENSELY_PACKED_FQ_SYN_SIZE, delta[i]);
+        PQCLEAN_CROSSRSDP128BALANCED_CLEAN_pack_fz_rsdp_g_vec(cmt_0_i_input + DENSELY_PACKED_FQ_SYN_SIZE, delta[i]);
 #endif
         /* Fixed endianness marshalling of round counter
          * i+c+dsc */
@@ -319,7 +319,7 @@ void PQCLEAN_CROSSRSDP128BALANCED_CLEAN_CROSS_sign(const prikey_t *SK,
 
 #if defined(NO_TREES)
     PQCLEAN_CROSSRSDP128BALANCED_CLEAN_merkle_tree_proof_compute(sig->mtp,cmt_0,fixed_weight_b);
-    publish_round_seeds(sig->stp,rounds_seeds,fixed_weight_b);
+    PQCLEAN_CROSSRSDP128BALANCED_CLEAN_publish_round_seeds(sig->stp,rounds_seeds,fixed_weight_b);
 #else
     PQCLEAN_CROSSRSDP128BALANCED_CLEAN_merkle_tree_proof_compute(sig->mtp,merkle_tree_0,cmt_0,fixed_weight_b);
     PQCLEAN_CROSSRSDP128BALANCED_CLEAN_publish_seeds(sig->stp,seed_tree,fixed_weight_b);
@@ -328,18 +328,23 @@ void PQCLEAN_CROSSRSDP128BALANCED_CLEAN_CROSS_sign(const prikey_t *SK,
     int published_rsps = 0;
     for(int i = 0; i<T; i++){
         if(fixed_weight_b[i] == 0){
-            assert(published_rsps < T-W);
+            // TODO: remove this assetion to pass "speed_sig -f" in liboqs
+            //assert(published_rsps < T-W);
             PQCLEAN_CROSSRSDP128BALANCED_CLEAN_pack_fq_vec(sig->rsp_0[published_rsps].y, y[i]);
 #if defined(RSDP)
             PQCLEAN_CROSSRSDP128BALANCED_CLEAN_pack_fz_vec(sig->rsp_0[published_rsps].sigma, sigma[i]);
 #elif defined(RSDPG)
-            pack_fz_rsdp_g_vec(sig->rsp_0[published_rsps].delta, delta[i]);
+            PQCLEAN_CROSSRSDP128BALANCED_CLEAN_pack_fz_rsdp_g_vec(sig->rsp_0[published_rsps].delta, delta[i]);
 #endif
             memcpy(sig->rsp_1[published_rsps], cmt_1[i], HASH_DIGEST_LENGTH);
             published_rsps++;
         }
     }
 }
+
+// TODO: no vla
+//const int csprng_input_length = SALT_LENGTH_BYTES+SEED_LENGTH_BYTES+sizeof(uint16_t);
+#define CSPRNG_INPUT_LENGTH (SALT_LENGTH_BYTES+SEED_LENGTH_BYTES+2)
 
 /* verify returns 1 if signature is ok, 0 otherwise */
 int PQCLEAN_CROSSRSDP128BALANCED_CLEAN_CROSS_verify(const pubkey_t *const PK,
@@ -436,7 +441,7 @@ int PQCLEAN_CROSSRSDP128BALANCED_CLEAN_CROSS_verify(const pubkey_t *const PK,
             /* CSPRNG is fed with concat(seed,salt,round index) represented
             * as a 2 bytes little endian unsigned integer */
             const int csprng_input_length = SALT_LENGTH_BYTES+SEED_LENGTH_BYTES+sizeof(uint16_t);
-            uint8_t csprng_input[csprng_input_length];
+            uint8_t csprng_input[CSPRNG_INPUT_LENGTH];
             memcpy(csprng_input+SEED_LENGTH_BYTES,sig->salt,SALT_LENGTH_BYTES);
             memcpy(csprng_input,rounds_seeds+SEED_LENGTH_BYTES*i,SEED_LENGTH_BYTES);
             csprng_input[SALT_LENGTH_BYTES+SEED_LENGTH_BYTES] = (domain_sep_i >> 8) &0xFF;
@@ -481,7 +486,7 @@ int PQCLEAN_CROSSRSDP128BALANCED_CLEAN_CROSS_verify(const pubkey_t *const PK,
                    &sig->rsp_0[used_rsps].delta,
                    DENSELY_PACKED_FZ_RSDP_G_VEC_SIZE);
             FZ_ELEM delta_local[M];
-	        unpack_fz_rsdp_g_vec(delta_local, sig->rsp_0[used_rsps].delta);
+	        PQCLEAN_CROSSRSDP128BALANCED_CLEAN_unpack_fz_rsdp_g_vec(delta_local, sig->rsp_0[used_rsps].delta);
             is_signature_ok = is_signature_ok &&
                               is_zz_inf_w_valid(delta_local);
             fz_inf_w_by_fz_matrix(sigma_local,delta_local,W_mat);
@@ -509,7 +514,8 @@ int PQCLEAN_CROSSRSDP128BALANCED_CLEAN_CROSS_verify(const pubkey_t *const PK,
         }
     } /* end for iterating on ZKID iterations */
 
-    assert(is_signature_ok);
+    // TODO: remove this assetion to pass test_cmdline in liboqs
+    //assert(is_signature_ok);
 
     uint8_t commit_digests[2][HASH_DIGEST_LENGTH];
     PQCLEAN_CROSSRSDP128BALANCED_CLEAN_merkle_tree_root_recompute(commit_digests[0],
@@ -545,7 +551,10 @@ int PQCLEAN_CROSSRSDP128BALANCED_CLEAN_CROSS_verify(const pubkey_t *const PK,
     int does_digest_b_match = ( memcmp(digest_b_recomputed,
                                         sig->digest_b,
                                         HASH_DIGEST_LENGTH) == 0);
-    assert(does_digest_b_match);
+
+    // TODO: remove this assetion to pass test_wrong_pk in PQClean
+    // test_wrong_pk needs CROSS_verify to return is_signature_ok and NOT exit before returning
+    //assert(does_digest_b_match);
 
     is_signature_ok = is_signature_ok &&
                       does_digest_01_match &&

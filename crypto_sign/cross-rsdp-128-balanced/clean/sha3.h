@@ -122,8 +122,10 @@ void xof_shake_extract(SHAKE_STATE_STRUCT *state,
                        uint32_t outputByteLen){
 #if defined(CATEGORY_1)
    PQCLEAN_CROSSRSDP128BALANCED_CLEAN_shake128_inc_squeeze(output, outputByteLen, state);
+   // TODO: release CSPRNG_state
 #else
    PQCLEAN_CROSSRSDP128BALANCED_CLEAN_shake256_inc_squeeze(output, outputByteLen, state);
+   // TODO: release CSPRNG_state
 #endif
 }
 #endif

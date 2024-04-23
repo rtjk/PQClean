@@ -12,6 +12,8 @@
 
 #include "fips202.h"
 
+#include <stdio.h> // TODO: remove
+
 #define NROUNDS 24
 #define ROL(a, offset) (((a) << (offset)) ^ ((a) >> (64 - (offset))))
 
@@ -498,6 +500,9 @@ static void keccak_inc_finalize(uint64_t *s_inc, uint32_t r, uint8_t p) {
 static void keccak_inc_squeeze(uint8_t *h, size_t outlen,
                                uint64_t *s_inc, uint32_t r) {
     size_t i;
+
+    printf("\n\n\n**** PRINT ****\n\n\n");fflush(stdin);
+    if(0 < s_inc[25]) {printf("\n\n\n**** IF ****\n\n\n");fflush(stdin);}
 
     /* First consume any bytes we still have sitting around */
     for (i = 0; i < outlen && i < s_inc[25]; i++) {

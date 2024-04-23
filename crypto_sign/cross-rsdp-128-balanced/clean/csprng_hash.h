@@ -27,6 +27,9 @@
 #include "parameters.h"
 #include "sha3.h"
 
+// TODO: check max buffer size
+#define EXTRA_BYTES_FIX 4
+
 /************************* CSPRNG ********************************/
 
 #define CSPRNG_STATE_T SHAKE_STATE_STRUCT
@@ -52,12 +55,12 @@ void csprng_randombytes(unsigned char * const x,
 /******************************************************************************/
 
 /* global csprng state employed to have deterministic randombytes for testing */
-extern CSPRNG_STATE_T platform_csprng_state;
+extern CSPRNG_STATE_T PQCLEAN_CROSSRSDP128BALANCED_CLEAN_platform_csprng_state;
 /* extracts xlen bytes from the global CSPRNG */
 static inline
 void randombytes(unsigned char * x,
                  uint64_t xlen) {
-   csprng_randombytes(x,xlen,&platform_csprng_state);
+   csprng_randombytes(x,xlen,&PQCLEAN_CROSSRSDP128BALANCED_CLEAN_platform_csprng_state);
 }
 
 /************************* HASH functions ********************************/
@@ -109,10 +112,7 @@ void CSPRNG_fq_vec(FQ_ELEM res[N],
     const FQ_ELEM mask = ( (FQ_ELEM) 1 << BITS_FOR_Q) - 1;
     
     // TODO: check max buffer size
-    int buffer_bits = N * BITS_FOR_Q + 64;
-    int buffer_size = ROUND_UP(buffer_bits,8)/8;
-    uint8_t CSPRNG_buffer[buffer_size];
-    //uint8_t CSPRNG_buffer[ROUND_UP(BITS_N_ZQ_CT_RNG,8)/8];
+    uint8_t CSPRNG_buffer[EXTRA_BYTES_FIX+ROUND_UP(BITS_N_ZQ_CT_RNG,8)/8];
     
     /* To facilitate hardware implementations, the uint64_t 
      * sub-buffer is consumed starting from the least significant byte 
@@ -152,7 +152,10 @@ static inline
 void CSPRNG_fq_vec_beta(FQ_ELEM res[T],
                    CSPRNG_STATE_T * const csprng_state){
     const FQ_ELEM mask = ( (FQ_ELEM) 1 << BITS_FOR_Q_M_ONE) - 1;
-    uint8_t CSPRNG_buffer[ROUND_UP(BITS_BETA_ZQSTAR_CT_RNG,8)/8];
+
+    // TODO: check max buffer size
+    uint8_t CSPRNG_buffer[EXTRA_BYTES_FIX+ROUND_UP(BITS_BETA_ZQSTAR_CT_RNG,8)/8];
+    
     /* To facilitate hardware implementations, the uint64_t 
      * sub-buffer is consumed starting from the least significant byte 
      * i.e., from the first being output by SHAKE. Bits in the byte are 
@@ -189,7 +192,10 @@ static inline
 void CSPRNG_fq_mat(FQ_ELEM res[K][N-K],
                    CSPRNG_STATE_T * const csprng_state){
     const FQ_ELEM mask = ( (FQ_ELEM) 1 << BITS_TO_REPRESENT(Q-1)) - 1;
-    uint8_t CSPRNG_buffer[ROUND_UP(BITS_V_CT_RNG,8)/8];
+
+    // TODO: check max buffer size
+    uint8_t CSPRNG_buffer[EXTRA_BYTES_FIX+ROUND_UP(BITS_V_CT_RNG,8)/8];
+
     /* To facilitate hardware implementations, the uint64_t 
      * sub-buffer is consumed starting from the least significant byte 
      * i.e., from the first being output by SHAKE. Bits in the byte are 
@@ -227,7 +233,10 @@ static inline
 void CSPRNG_zz_vec(FZ_ELEM res[N],
                    CSPRNG_STATE_T * const csprng_state){
     const FZ_ELEM mask = ( (FZ_ELEM) 1 << BITS_TO_REPRESENT(Z-1)) - 1;
-    uint8_t CSPRNG_buffer[ROUND_UP(BITS_N_ZZ_CT_RNG,8)/8];
+
+    // TODO: check max buffer size
+    uint8_t CSPRNG_buffer[EXTRA_BYTES_FIX+ROUND_UP(BITS_N_ZZ_CT_RNG,8)/8];
+
     /* To facilitate hardware implementations, the uint64_t 
      * sub-buffer is consumed starting from the least significant byte 
      * i.e., from the first being output by SHAKE. Bits in the byte are 
@@ -265,7 +274,10 @@ static inline
 void CSPRNG_zz_inf_w(FZ_ELEM res[M],
                    CSPRNG_STATE_T * const csprng_state){
     const FZ_ELEM mask = ( (FZ_ELEM) 1 << BITS_TO_REPRESENT(Z-1)) - 1;
-    uint8_t CSPRNG_buffer[ROUND_UP(BITS_M_ZZ_CT_RNG,8)/8];
+
+    // TODO: check max buffer size
+    uint8_t CSPRNG_buffer[EXTRA_BYTES_FIX+ROUND_UP(BITS_M_ZZ_CT_RNG,8)/8];
+
     /* To facilitate hardware implementations, the uint64_t 
      * sub-buffer is consumed starting from the least significant byte 
      * i.e., from the first being output by SHAKE. Bits in the byte are 
@@ -302,7 +314,10 @@ static inline
 void CSPRNG_fz_mat(FZ_ELEM res[M][N-M],
                    CSPRNG_STATE_T * const csprng_state){
     const FZ_ELEM mask = ( (FZ_ELEM) 1 << BITS_TO_REPRESENT(Z-1)) - 1;
-    uint8_t CSPRNG_buffer[ROUND_UP(BITS_W_CT_RNG,8)/8];
+
+    // TODO: check max buffer size
+    uint8_t CSPRNG_buffer[EXTRA_BYTES_FIX+ROUND_UP(BITS_W_CT_RNG,8)/8];
+
     /* To facilitate hardware implementations, the uint64_t 
      * sub-buffer is consumed starting from the least significant byte 
      * i.e., from the first being output by SHAKE. Bits in the byte are 

@@ -72,7 +72,7 @@ void PQCLEAN_CROSSRSDP128BALANCED_CLEAN_pack_fz_vec(uint8_t out[DENSELY_PACKED_F
 }
 
 /* 
- * pack_fz_rsdp_g_vec()
+ * PQCLEAN_CROSSRSDP128BALANCED_CLEAN_pack_fz_rsdp_g_vec()
  *
  * uint8_t out[DENSELY_PACKED_FZ_RSDP_G_VEC_SIZE]    :   Zz packed in bytes
  * const FZ_ELEM in[M]                               :   Zz Vec input, to be packed
@@ -80,7 +80,7 @@ void PQCLEAN_CROSSRSDP128BALANCED_CLEAN_pack_fz_vec(uint8_t out[DENSELY_PACKED_F
  * This function handles the packing of the add. rdsp(g) vector in Zz
  */
 #ifdef RSDPG
-void pack_fz_rsdp_g_vec(uint8_t out[DENSELY_PACKED_FZ_RSDP_G_VEC_SIZE],
+void PQCLEAN_CROSSRSDP128BALANCED_CLEAN_pack_fz_rsdp_g_vec(uint8_t out[DENSELY_PACKED_FZ_RSDP_G_VEC_SIZE],
                    const FZ_ELEM in[M])
 {
    PQCLEAN_CROSSRSDP128BALANCED_CLEAN_generic_pack_fz(out, in, DENSELY_PACKED_FZ_RSDP_G_VEC_SIZE, M);
@@ -476,7 +476,7 @@ void PQCLEAN_CROSSRSDP128BALANCED_CLEAN_unpack_fz_vec(FZ_ELEM out[N],
 }
 
 /* 
- * unpack_fz_rsdp_g_vec()
+ * PQCLEAN_CROSSRSDP128BALANCED_CLEAN_unpack_fz_rsdp_g_vec()
  *
  * FZ_ELEM out[M]                               :   FZ Vec output
  * const uint8_t in[DENSELY_PACKED_FZ_VEC_SIZE] :   FZ Byte input, to be unpckd
@@ -484,7 +484,7 @@ void PQCLEAN_CROSSRSDP128BALANCED_CLEAN_unpack_fz_vec(FZ_ELEM out[N],
  * This function handles the unpacking of FQ
  */
 #ifdef RSDPG
-void unpack_fz_rsdp_g_vec(FZ_ELEM out[M],
+void PQCLEAN_CROSSRSDP128BALANCED_CLEAN_unpack_fz_rsdp_g_vec(FZ_ELEM out[M],
                    const uint8_t in[DENSELY_PACKED_FZ_RSDP_G_VEC_SIZE])
 {
    PQCLEAN_CROSSRSDP128BALANCED_CLEAN_generic_unpack_fz(out, in, M, DENSELY_PACKED_FZ_RSDP_G_VEC_SIZE);
