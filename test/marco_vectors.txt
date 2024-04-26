@@ -1,0 +1,1117 @@
+============================= test session starts ==============================
+platform linux -- Python 3.11.2, pytest-8.1.1, pluggy-1.4.0
+rootdir: /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test
+configfile: pytest.ini
+plugins: xdist-3.5.0
+collected 18 items
+
+test_testvectors.py FFFFFFFFFF.FFFFFFF                                   [100%]
+
+=================================== FAILURES ===================================
+______ test_testvectors[clean implementation of cross-rsdpg-256-balanced] ______
+
+implementation = <Implementation(cross-rsdpg-256-balanced, clean)>
+impl_path = '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__EhmdG9b6/crypto_bla/scheme/impl'
+test_dir = '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__EhmdG9b6'
+init = <function isolate_test_files.<locals>.initializer at 0x7f938643ccc0>
+destr = <function isolate_test_files.<locals>.destructor at 0x7f938643ce00>
+
+    @pytest.mark.parametrize(
+        'implementation,test_dir,impl_path,init,destr',
+        [(impl, *helpers.isolate_test_files(impl.path(), 'test_testvectors_'))
+         for sig in pqclean.Signature.all_sigs()
+         for impl in sig.implementations],
+        ids=[str(impl) for sig in pqclean.Signature.all_sigs()
+             for impl in sig.implementations],
+    )
+    @helpers.filtered_test
+    def test_testvectors(implementation, impl_path, test_dir, init, destr):
+        if not implementation.supported_on_current_platform():
+            raise unittest.SkipTest("Not supported on current platform")
+        if platform.machine() == 'armv7l' and 'gcc' in os.environ.get('CC', 'gcc') and 'falcon' in implementation.scheme.name:
+            raise unittest.SkipTest("this test hangs for falcon on armv7l with gcc")
+        init()
+        dest_dir = os.path.join(test_dir, 'bin')
+        helpers.make('testvectors',
+                     TYPE=implementation.scheme.type,
+                     SCHEME=implementation.scheme.name,
+                     SCHEME_DIR=impl_path,
+                     IMPLEMENTATION=implementation.name,
+                     DEST_DIR=dest_dir,
+                     working_dir=os.path.join(test_dir, 'test'))
+        out = helpers.run_subprocess(
+            [os.path.join(dest_dir, 'testvectors_{}_{}{}'.format(
+                implementation.scheme.name,
+                implementation.name,
+                '.exe' if os.name == 'nt' else ''
+            ))],
+            print_output=False,
+        ).replace('\r', '')
+>       assert(implementation.scheme.metadata()['testvectors-sha256'].lower()
+               == hashlib.sha256(out.encode('utf-8')).hexdigest().lower())
+E       AssertionError: assert '71526c6dd75d...cdba783eaad31' == '5a28d8994e2d...657c6318054ef'
+E         
+E         - 5a28d8994e2dd3ac28a3f15b7d187cf6e2c8affff1b39890079657c6318054ef
+E         + 71526c6dd75df95fa2382e45f69f9c0398ff6eef2e5ce2a9287cdba783eaad31
+
+test_testvectors.py:48: AssertionError
+----------------------------- Captured stdout call -----------------------------
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__EhmdG9b6/test > make TYPE=sign SCHEME=cross-rsdpg-256-balanced SCHEME_DIR=/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__EhmdG9b6/crypto_bla/scheme/impl IMPLEMENTATION=clean DEST_DIR=/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__EhmdG9b6/bin testvectors
+cd /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__EhmdG9b6/crypto_bla/scheme/impl && make
+make[1]: Entering directory '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__EhmdG9b6/crypto_bla/scheme/impl'
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o CROSS.o CROSS.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o csprng_hash.o csprng_hash.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o merkle.o merkle.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o pack_unpack.o pack_unpack.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o seedtree.o seedtree.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o sign.o sign.c
+ar -r libcross-rsdpg-256-balanced_clean.a CROSS.o csprng_hash.o merkle.o pack_unpack.o seedtree.o sign.o
+ar: creating libcross-rsdpg-256-balanced_clean.a
+make[1]: Leaving directory '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__EhmdG9b6/crypto_bla/scheme/impl'
+mkdir -p /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__EhmdG9b6/bin
+cc -O3 -Wall -Wextra -Wpedantic -Wvla -Werror -std=c99 -Wundef -Wshadow -Wcast-align -Wpointer-arith -Wmissing-prototypes -fstrict-aliasing -fno-common -pipe -I../common  -DPQCLEAN_NAMESPACE=PQCLEAN_CROSSRSDPG256BALANCED_CLEAN -I/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__EhmdG9b6/crypto_bla/scheme/impl crypto_sign/testvectors.c ../common/aes.c ../common/sha2.c ../common/fips202.c ../common/nistseedexpander.c ../common/sp800-185.c ../test/common/notrandombytes.c -o /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__EhmdG9b6/bin/testvectors_cross-rsdpg-256-balanced_clean -L/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__EhmdG9b6/crypto_bla/scheme/impl -lcross-rsdpg-256-balanced_clean
+
+. > /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__EhmdG9b6/bin/testvectors_cross-rsdpg-256-balanced_clean
+________ test_testvectors[clean implementation of cross-rsdp-192-fast] _________
+
+implementation = <Implementation(cross-rsdp-192-fast, clean)>
+impl_path = '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__WGVXC7HC/crypto_bla/scheme/impl'
+test_dir = '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__WGVXC7HC'
+init = <function isolate_test_files.<locals>.initializer at 0x7f938643cea0>
+destr = <function isolate_test_files.<locals>.destructor at 0x7f938643cfe0>
+
+    @pytest.mark.parametrize(
+        'implementation,test_dir,impl_path,init,destr',
+        [(impl, *helpers.isolate_test_files(impl.path(), 'test_testvectors_'))
+         for sig in pqclean.Signature.all_sigs()
+         for impl in sig.implementations],
+        ids=[str(impl) for sig in pqclean.Signature.all_sigs()
+             for impl in sig.implementations],
+    )
+    @helpers.filtered_test
+    def test_testvectors(implementation, impl_path, test_dir, init, destr):
+        if not implementation.supported_on_current_platform():
+            raise unittest.SkipTest("Not supported on current platform")
+        if platform.machine() == 'armv7l' and 'gcc' in os.environ.get('CC', 'gcc') and 'falcon' in implementation.scheme.name:
+            raise unittest.SkipTest("this test hangs for falcon on armv7l with gcc")
+        init()
+        dest_dir = os.path.join(test_dir, 'bin')
+        helpers.make('testvectors',
+                     TYPE=implementation.scheme.type,
+                     SCHEME=implementation.scheme.name,
+                     SCHEME_DIR=impl_path,
+                     IMPLEMENTATION=implementation.name,
+                     DEST_DIR=dest_dir,
+                     working_dir=os.path.join(test_dir, 'test'))
+        out = helpers.run_subprocess(
+            [os.path.join(dest_dir, 'testvectors_{}_{}{}'.format(
+                implementation.scheme.name,
+                implementation.name,
+                '.exe' if os.name == 'nt' else ''
+            ))],
+            print_output=False,
+        ).replace('\r', '')
+>       assert(implementation.scheme.metadata()['testvectors-sha256'].lower()
+               == hashlib.sha256(out.encode('utf-8')).hexdigest().lower())
+E       AssertionError: assert 'ef09125f4446...97c5b9ab5bb55' == 'b6e0fb6bd931...c24247718ba99'
+E         
+E         - b6e0fb6bd931fc2006c65f054f1abd8ac02163bc5a5035114f8c24247718ba99
+E         + ef09125f444674b5fa5c38cb280cd259f50ec205dcf79514c5d97c5b9ab5bb55
+
+test_testvectors.py:48: AssertionError
+----------------------------- Captured stdout call -----------------------------
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__WGVXC7HC/test > make TYPE=sign SCHEME=cross-rsdp-192-fast SCHEME_DIR=/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__WGVXC7HC/crypto_bla/scheme/impl IMPLEMENTATION=clean DEST_DIR=/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__WGVXC7HC/bin testvectors
+cd /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__WGVXC7HC/crypto_bla/scheme/impl && make
+make[1]: Entering directory '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__WGVXC7HC/crypto_bla/scheme/impl'
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o CROSS.o CROSS.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o csprng_hash.o csprng_hash.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o merkle.o merkle.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o pack_unpack.o pack_unpack.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o seedtree.o seedtree.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o sign.o sign.c
+ar -r libcross-rsdp-192-fast_clean.a CROSS.o csprng_hash.o merkle.o pack_unpack.o seedtree.o sign.o
+ar: creating libcross-rsdp-192-fast_clean.a
+make[1]: Leaving directory '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__WGVXC7HC/crypto_bla/scheme/impl'
+mkdir -p /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__WGVXC7HC/bin
+cc -O3 -Wall -Wextra -Wpedantic -Wvla -Werror -std=c99 -Wundef -Wshadow -Wcast-align -Wpointer-arith -Wmissing-prototypes -fstrict-aliasing -fno-common -pipe -I../common  -DPQCLEAN_NAMESPACE=PQCLEAN_CROSSRSDP192FAST_CLEAN -I/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__WGVXC7HC/crypto_bla/scheme/impl crypto_sign/testvectors.c ../common/aes.c ../common/sha2.c ../common/fips202.c ../common/nistseedexpander.c ../common/sp800-185.c ../test/common/notrandombytes.c -o /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__WGVXC7HC/bin/testvectors_cross-rsdp-192-fast_clean -L/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__WGVXC7HC/crypto_bla/scheme/impl -lcross-rsdp-192-fast_clean
+
+. > /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__WGVXC7HC/bin/testvectors_cross-rsdp-192-fast_clean
+________ test_testvectors[clean implementation of cross-rsdp-192-small] ________
+
+implementation = <Implementation(cross-rsdp-192-small, clean)>
+impl_path = '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__8EiDRKQP/crypto_bla/scheme/impl'
+test_dir = '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__8EiDRKQP'
+init = <function isolate_test_files.<locals>.initializer at 0x7f938643d080>
+destr = <function isolate_test_files.<locals>.destructor at 0x7f938643d1c0>
+
+    @pytest.mark.parametrize(
+        'implementation,test_dir,impl_path,init,destr',
+        [(impl, *helpers.isolate_test_files(impl.path(), 'test_testvectors_'))
+         for sig in pqclean.Signature.all_sigs()
+         for impl in sig.implementations],
+        ids=[str(impl) for sig in pqclean.Signature.all_sigs()
+             for impl in sig.implementations],
+    )
+    @helpers.filtered_test
+    def test_testvectors(implementation, impl_path, test_dir, init, destr):
+        if not implementation.supported_on_current_platform():
+            raise unittest.SkipTest("Not supported on current platform")
+        if platform.machine() == 'armv7l' and 'gcc' in os.environ.get('CC', 'gcc') and 'falcon' in implementation.scheme.name:
+            raise unittest.SkipTest("this test hangs for falcon on armv7l with gcc")
+        init()
+        dest_dir = os.path.join(test_dir, 'bin')
+        helpers.make('testvectors',
+                     TYPE=implementation.scheme.type,
+                     SCHEME=implementation.scheme.name,
+                     SCHEME_DIR=impl_path,
+                     IMPLEMENTATION=implementation.name,
+                     DEST_DIR=dest_dir,
+                     working_dir=os.path.join(test_dir, 'test'))
+        out = helpers.run_subprocess(
+            [os.path.join(dest_dir, 'testvectors_{}_{}{}'.format(
+                implementation.scheme.name,
+                implementation.name,
+                '.exe' if os.name == 'nt' else ''
+            ))],
+            print_output=False,
+        ).replace('\r', '')
+>       assert(implementation.scheme.metadata()['testvectors-sha256'].lower()
+               == hashlib.sha256(out.encode('utf-8')).hexdigest().lower())
+E       AssertionError: assert 'fe2a155d2825...be9d9d7fd049f' == '7889ec8e89ec...28c3102842d61'
+E         
+E         - 7889ec8e89ec9e09160f4352454b6d83680b3775866ea45fc6628c3102842d61
+E         + fe2a155d28254e235e46070bc48d30f23b58b9185b8d8ef6a75be9d9d7fd049f
+
+test_testvectors.py:48: AssertionError
+----------------------------- Captured stdout call -----------------------------
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__8EiDRKQP/test > make TYPE=sign SCHEME=cross-rsdp-192-small SCHEME_DIR=/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__8EiDRKQP/crypto_bla/scheme/impl IMPLEMENTATION=clean DEST_DIR=/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__8EiDRKQP/bin testvectors
+cd /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__8EiDRKQP/crypto_bla/scheme/impl && make
+make[1]: Entering directory '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__8EiDRKQP/crypto_bla/scheme/impl'
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o CROSS.o CROSS.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o csprng_hash.o csprng_hash.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o merkle.o merkle.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o pack_unpack.o pack_unpack.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o seedtree.o seedtree.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o sign.o sign.c
+ar -r libcross-rsdp-192-small_clean.a CROSS.o csprng_hash.o merkle.o pack_unpack.o seedtree.o sign.o
+ar: creating libcross-rsdp-192-small_clean.a
+make[1]: Leaving directory '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__8EiDRKQP/crypto_bla/scheme/impl'
+mkdir -p /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__8EiDRKQP/bin
+cc -O3 -Wall -Wextra -Wpedantic -Wvla -Werror -std=c99 -Wundef -Wshadow -Wcast-align -Wpointer-arith -Wmissing-prototypes -fstrict-aliasing -fno-common -pipe -I../common  -DPQCLEAN_NAMESPACE=PQCLEAN_CROSSRSDP192SMALL_CLEAN -I/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__8EiDRKQP/crypto_bla/scheme/impl crypto_sign/testvectors.c ../common/aes.c ../common/sha2.c ../common/fips202.c ../common/nistseedexpander.c ../common/sp800-185.c ../test/common/notrandombytes.c -o /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__8EiDRKQP/bin/testvectors_cross-rsdp-192-small_clean -L/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__8EiDRKQP/crypto_bla/scheme/impl -lcross-rsdp-192-small_clean
+
+. > /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__8EiDRKQP/bin/testvectors_cross-rsdp-192-small_clean
+_______ test_testvectors[clean implementation of cross-rsdpg-192-small] ________
+
+implementation = <Implementation(cross-rsdpg-192-small, clean)>
+impl_path = '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__mXPtHywX/crypto_bla/scheme/impl'
+test_dir = '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__mXPtHywX'
+init = <function isolate_test_files.<locals>.initializer at 0x7f938643d260>
+destr = <function isolate_test_files.<locals>.destructor at 0x7f938643d3a0>
+
+    @pytest.mark.parametrize(
+        'implementation,test_dir,impl_path,init,destr',
+        [(impl, *helpers.isolate_test_files(impl.path(), 'test_testvectors_'))
+         for sig in pqclean.Signature.all_sigs()
+         for impl in sig.implementations],
+        ids=[str(impl) for sig in pqclean.Signature.all_sigs()
+             for impl in sig.implementations],
+    )
+    @helpers.filtered_test
+    def test_testvectors(implementation, impl_path, test_dir, init, destr):
+        if not implementation.supported_on_current_platform():
+            raise unittest.SkipTest("Not supported on current platform")
+        if platform.machine() == 'armv7l' and 'gcc' in os.environ.get('CC', 'gcc') and 'falcon' in implementation.scheme.name:
+            raise unittest.SkipTest("this test hangs for falcon on armv7l with gcc")
+        init()
+        dest_dir = os.path.join(test_dir, 'bin')
+        helpers.make('testvectors',
+                     TYPE=implementation.scheme.type,
+                     SCHEME=implementation.scheme.name,
+                     SCHEME_DIR=impl_path,
+                     IMPLEMENTATION=implementation.name,
+                     DEST_DIR=dest_dir,
+                     working_dir=os.path.join(test_dir, 'test'))
+        out = helpers.run_subprocess(
+            [os.path.join(dest_dir, 'testvectors_{}_{}{}'.format(
+                implementation.scheme.name,
+                implementation.name,
+                '.exe' if os.name == 'nt' else ''
+            ))],
+            print_output=False,
+        ).replace('\r', '')
+>       assert(implementation.scheme.metadata()['testvectors-sha256'].lower()
+               == hashlib.sha256(out.encode('utf-8')).hexdigest().lower())
+E       AssertionError: assert 'b72d355e5d2d...578f179c7740b' == '445bd83b87fa...1c3df521bdda5'
+E         
+E         - 445bd83b87fa10f7807fbfb3e1b8170c11304a9b7ac82cf80bc1c3df521bdda5
+E         + b72d355e5d2d5065a15ecd74ab8acea2637919c1159c4a22b7b578f179c7740b
+
+test_testvectors.py:48: AssertionError
+----------------------------- Captured stdout call -----------------------------
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__mXPtHywX/test > make TYPE=sign SCHEME=cross-rsdpg-192-small SCHEME_DIR=/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__mXPtHywX/crypto_bla/scheme/impl IMPLEMENTATION=clean DEST_DIR=/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__mXPtHywX/bin testvectors
+cd /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__mXPtHywX/crypto_bla/scheme/impl && make
+make[1]: Entering directory '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__mXPtHywX/crypto_bla/scheme/impl'
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o CROSS.o CROSS.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o csprng_hash.o csprng_hash.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o merkle.o merkle.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o pack_unpack.o pack_unpack.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o seedtree.o seedtree.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o sign.o sign.c
+ar -r libcross-rsdpg-192-small_clean.a CROSS.o csprng_hash.o merkle.o pack_unpack.o seedtree.o sign.o
+ar: creating libcross-rsdpg-192-small_clean.a
+make[1]: Leaving directory '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__mXPtHywX/crypto_bla/scheme/impl'
+mkdir -p /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__mXPtHywX/bin
+cc -O3 -Wall -Wextra -Wpedantic -Wvla -Werror -std=c99 -Wundef -Wshadow -Wcast-align -Wpointer-arith -Wmissing-prototypes -fstrict-aliasing -fno-common -pipe -I../common  -DPQCLEAN_NAMESPACE=PQCLEAN_CROSSRSDPG192SMALL_CLEAN -I/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__mXPtHywX/crypto_bla/scheme/impl crypto_sign/testvectors.c ../common/aes.c ../common/sha2.c ../common/fips202.c ../common/nistseedexpander.c ../common/sp800-185.c ../test/common/notrandombytes.c -o /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__mXPtHywX/bin/testvectors_cross-rsdpg-192-small_clean -L/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__mXPtHywX/crypto_bla/scheme/impl -lcross-rsdpg-192-small_clean
+
+. > /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__mXPtHywX/bin/testvectors_cross-rsdpg-192-small_clean
+________ test_testvectors[clean implementation of cross-rsdp-128-small] ________
+
+implementation = <Implementation(cross-rsdp-128-small, clean)>
+impl_path = '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__atDWGSQs/crypto_bla/scheme/impl'
+test_dir = '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__atDWGSQs'
+init = <function isolate_test_files.<locals>.initializer at 0x7f938643d440>
+destr = <function isolate_test_files.<locals>.destructor at 0x7f938643d580>
+
+    @pytest.mark.parametrize(
+        'implementation,test_dir,impl_path,init,destr',
+        [(impl, *helpers.isolate_test_files(impl.path(), 'test_testvectors_'))
+         for sig in pqclean.Signature.all_sigs()
+         for impl in sig.implementations],
+        ids=[str(impl) for sig in pqclean.Signature.all_sigs()
+             for impl in sig.implementations],
+    )
+    @helpers.filtered_test
+    def test_testvectors(implementation, impl_path, test_dir, init, destr):
+        if not implementation.supported_on_current_platform():
+            raise unittest.SkipTest("Not supported on current platform")
+        if platform.machine() == 'armv7l' and 'gcc' in os.environ.get('CC', 'gcc') and 'falcon' in implementation.scheme.name:
+            raise unittest.SkipTest("this test hangs for falcon on armv7l with gcc")
+        init()
+        dest_dir = os.path.join(test_dir, 'bin')
+        helpers.make('testvectors',
+                     TYPE=implementation.scheme.type,
+                     SCHEME=implementation.scheme.name,
+                     SCHEME_DIR=impl_path,
+                     IMPLEMENTATION=implementation.name,
+                     DEST_DIR=dest_dir,
+                     working_dir=os.path.join(test_dir, 'test'))
+        out = helpers.run_subprocess(
+            [os.path.join(dest_dir, 'testvectors_{}_{}{}'.format(
+                implementation.scheme.name,
+                implementation.name,
+                '.exe' if os.name == 'nt' else ''
+            ))],
+            print_output=False,
+        ).replace('\r', '')
+>       assert(implementation.scheme.metadata()['testvectors-sha256'].lower()
+               == hashlib.sha256(out.encode('utf-8')).hexdigest().lower())
+E       AssertionError: assert '97c8a6ae239d...5343ebe90c86e' == '47d141c0e4a7...7c20e46095411'
+E         
+E         - 47d141c0e4a7e44d3474d6a8e6eaf57f41fd17a2b6535c257157c20e46095411
+E         + 97c8a6ae239d4987d4dc8fd156b61c917c9aae05b9a6c19ba7e5343ebe90c86e
+
+test_testvectors.py:48: AssertionError
+----------------------------- Captured stdout call -----------------------------
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__atDWGSQs/test > make TYPE=sign SCHEME=cross-rsdp-128-small SCHEME_DIR=/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__atDWGSQs/crypto_bla/scheme/impl IMPLEMENTATION=clean DEST_DIR=/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__atDWGSQs/bin testvectors
+cd /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__atDWGSQs/crypto_bla/scheme/impl && make
+make[1]: Entering directory '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__atDWGSQs/crypto_bla/scheme/impl'
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o CROSS.o CROSS.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o csprng_hash.o csprng_hash.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o merkle.o merkle.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o pack_unpack.o pack_unpack.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o seedtree.o seedtree.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o sign.o sign.c
+ar -r libcross-rsdp-128-small_clean.a CROSS.o csprng_hash.o merkle.o pack_unpack.o seedtree.o sign.o
+ar: creating libcross-rsdp-128-small_clean.a
+make[1]: Leaving directory '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__atDWGSQs/crypto_bla/scheme/impl'
+mkdir -p /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__atDWGSQs/bin
+cc -O3 -Wall -Wextra -Wpedantic -Wvla -Werror -std=c99 -Wundef -Wshadow -Wcast-align -Wpointer-arith -Wmissing-prototypes -fstrict-aliasing -fno-common -pipe -I../common  -DPQCLEAN_NAMESPACE=PQCLEAN_CROSSRSDP128SMALL_CLEAN -I/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__atDWGSQs/crypto_bla/scheme/impl crypto_sign/testvectors.c ../common/aes.c ../common/sha2.c ../common/fips202.c ../common/nistseedexpander.c ../common/sp800-185.c ../test/common/notrandombytes.c -o /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__atDWGSQs/bin/testvectors_cross-rsdp-128-small_clean -L/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__atDWGSQs/crypto_bla/scheme/impl -lcross-rsdp-128-small_clean
+
+. > /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__atDWGSQs/bin/testvectors_cross-rsdp-128-small_clean
+______ test_testvectors[clean implementation of cross-rsdp-256-balanced] _______
+
+implementation = <Implementation(cross-rsdp-256-balanced, clean)>
+impl_path = '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__6GroW678/crypto_bla/scheme/impl'
+test_dir = '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__6GroW678'
+init = <function isolate_test_files.<locals>.initializer at 0x7f938643d620>
+destr = <function isolate_test_files.<locals>.destructor at 0x7f938643d760>
+
+    @pytest.mark.parametrize(
+        'implementation,test_dir,impl_path,init,destr',
+        [(impl, *helpers.isolate_test_files(impl.path(), 'test_testvectors_'))
+         for sig in pqclean.Signature.all_sigs()
+         for impl in sig.implementations],
+        ids=[str(impl) for sig in pqclean.Signature.all_sigs()
+             for impl in sig.implementations],
+    )
+    @helpers.filtered_test
+    def test_testvectors(implementation, impl_path, test_dir, init, destr):
+        if not implementation.supported_on_current_platform():
+            raise unittest.SkipTest("Not supported on current platform")
+        if platform.machine() == 'armv7l' and 'gcc' in os.environ.get('CC', 'gcc') and 'falcon' in implementation.scheme.name:
+            raise unittest.SkipTest("this test hangs for falcon on armv7l with gcc")
+        init()
+        dest_dir = os.path.join(test_dir, 'bin')
+        helpers.make('testvectors',
+                     TYPE=implementation.scheme.type,
+                     SCHEME=implementation.scheme.name,
+                     SCHEME_DIR=impl_path,
+                     IMPLEMENTATION=implementation.name,
+                     DEST_DIR=dest_dir,
+                     working_dir=os.path.join(test_dir, 'test'))
+        out = helpers.run_subprocess(
+            [os.path.join(dest_dir, 'testvectors_{}_{}{}'.format(
+                implementation.scheme.name,
+                implementation.name,
+                '.exe' if os.name == 'nt' else ''
+            ))],
+            print_output=False,
+        ).replace('\r', '')
+>       assert(implementation.scheme.metadata()['testvectors-sha256'].lower()
+               == hashlib.sha256(out.encode('utf-8')).hexdigest().lower())
+E       AssertionError: assert 'a049cb9fd974...2103852536b71' == 'f534698fe336...18d116fbce4c7'
+E         
+E         - f534698fe33638b212d7ff988c192b0ab1aa73aa81f1908375d18d116fbce4c7
+E         + a049cb9fd974d0642e71209def49649825e3418b03cfd54fdbf2103852536b71
+
+test_testvectors.py:48: AssertionError
+----------------------------- Captured stdout call -----------------------------
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__6GroW678/test > make TYPE=sign SCHEME=cross-rsdp-256-balanced SCHEME_DIR=/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__6GroW678/crypto_bla/scheme/impl IMPLEMENTATION=clean DEST_DIR=/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__6GroW678/bin testvectors
+cd /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__6GroW678/crypto_bla/scheme/impl && make
+make[1]: Entering directory '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__6GroW678/crypto_bla/scheme/impl'
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o CROSS.o CROSS.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o csprng_hash.o csprng_hash.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o merkle.o merkle.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o pack_unpack.o pack_unpack.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o seedtree.o seedtree.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o sign.o sign.c
+ar -r libcross-rsdp-256-balanced_clean.a CROSS.o csprng_hash.o merkle.o pack_unpack.o seedtree.o sign.o
+ar: creating libcross-rsdp-256-balanced_clean.a
+make[1]: Leaving directory '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__6GroW678/crypto_bla/scheme/impl'
+mkdir -p /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__6GroW678/bin
+cc -O3 -Wall -Wextra -Wpedantic -Wvla -Werror -std=c99 -Wundef -Wshadow -Wcast-align -Wpointer-arith -Wmissing-prototypes -fstrict-aliasing -fno-common -pipe -I../common  -DPQCLEAN_NAMESPACE=PQCLEAN_CROSSRSDP256BALANCED_CLEAN -I/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__6GroW678/crypto_bla/scheme/impl crypto_sign/testvectors.c ../common/aes.c ../common/sha2.c ../common/fips202.c ../common/nistseedexpander.c ../common/sp800-185.c ../test/common/notrandombytes.c -o /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__6GroW678/bin/testvectors_cross-rsdp-256-balanced_clean -L/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__6GroW678/crypto_bla/scheme/impl -lcross-rsdp-256-balanced_clean
+
+. > /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__6GroW678/bin/testvectors_cross-rsdp-256-balanced_clean
+______ test_testvectors[clean implementation of cross-rsdpg-128-balanced] ______
+
+implementation = <Implementation(cross-rsdpg-128-balanced, clean)>
+impl_path = '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__OQ72St0L/crypto_bla/scheme/impl'
+test_dir = '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__OQ72St0L'
+init = <function isolate_test_files.<locals>.initializer at 0x7f938643d800>
+destr = <function isolate_test_files.<locals>.destructor at 0x7f938643d940>
+
+    @pytest.mark.parametrize(
+        'implementation,test_dir,impl_path,init,destr',
+        [(impl, *helpers.isolate_test_files(impl.path(), 'test_testvectors_'))
+         for sig in pqclean.Signature.all_sigs()
+         for impl in sig.implementations],
+        ids=[str(impl) for sig in pqclean.Signature.all_sigs()
+             for impl in sig.implementations],
+    )
+    @helpers.filtered_test
+    def test_testvectors(implementation, impl_path, test_dir, init, destr):
+        if not implementation.supported_on_current_platform():
+            raise unittest.SkipTest("Not supported on current platform")
+        if platform.machine() == 'armv7l' and 'gcc' in os.environ.get('CC', 'gcc') and 'falcon' in implementation.scheme.name:
+            raise unittest.SkipTest("this test hangs for falcon on armv7l with gcc")
+        init()
+        dest_dir = os.path.join(test_dir, 'bin')
+        helpers.make('testvectors',
+                     TYPE=implementation.scheme.type,
+                     SCHEME=implementation.scheme.name,
+                     SCHEME_DIR=impl_path,
+                     IMPLEMENTATION=implementation.name,
+                     DEST_DIR=dest_dir,
+                     working_dir=os.path.join(test_dir, 'test'))
+        out = helpers.run_subprocess(
+            [os.path.join(dest_dir, 'testvectors_{}_{}{}'.format(
+                implementation.scheme.name,
+                implementation.name,
+                '.exe' if os.name == 'nt' else ''
+            ))],
+            print_output=False,
+        ).replace('\r', '')
+>       assert(implementation.scheme.metadata()['testvectors-sha256'].lower()
+               == hashlib.sha256(out.encode('utf-8')).hexdigest().lower())
+E       AssertionError: assert '35d849684ab2...0a9b9274f2574' == '78c2e11082c4...b34d99472f688'
+E         
+E         - 78c2e11082c46023eda826e6bea3cec0141697c7755e6f2ca03b34d99472f688
+E         + 35d849684ab2127b88b191b8f90d84b29411af5b935b9595ff70a9b9274f2574
+
+test_testvectors.py:48: AssertionError
+----------------------------- Captured stdout call -----------------------------
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__OQ72St0L/test > make TYPE=sign SCHEME=cross-rsdpg-128-balanced SCHEME_DIR=/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__OQ72St0L/crypto_bla/scheme/impl IMPLEMENTATION=clean DEST_DIR=/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__OQ72St0L/bin testvectors
+cd /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__OQ72St0L/crypto_bla/scheme/impl && make
+make[1]: Entering directory '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__OQ72St0L/crypto_bla/scheme/impl'
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o CROSS.o CROSS.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o csprng_hash.o csprng_hash.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o merkle.o merkle.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o pack_unpack.o pack_unpack.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o seedtree.o seedtree.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o sign.o sign.c
+ar -r libcross-rsdpg-128-balanced_clean.a CROSS.o csprng_hash.o merkle.o pack_unpack.o seedtree.o sign.o
+ar: creating libcross-rsdpg-128-balanced_clean.a
+make[1]: Leaving directory '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__OQ72St0L/crypto_bla/scheme/impl'
+mkdir -p /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__OQ72St0L/bin
+cc -O3 -Wall -Wextra -Wpedantic -Wvla -Werror -std=c99 -Wundef -Wshadow -Wcast-align -Wpointer-arith -Wmissing-prototypes -fstrict-aliasing -fno-common -pipe -I../common  -DPQCLEAN_NAMESPACE=PQCLEAN_CROSSRSDPG128BALANCED_CLEAN -I/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__OQ72St0L/crypto_bla/scheme/impl crypto_sign/testvectors.c ../common/aes.c ../common/sha2.c ../common/fips202.c ../common/nistseedexpander.c ../common/sp800-185.c ../test/common/notrandombytes.c -o /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__OQ72St0L/bin/testvectors_cross-rsdpg-128-balanced_clean -L/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__OQ72St0L/crypto_bla/scheme/impl -lcross-rsdpg-128-balanced_clean
+
+. > /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__OQ72St0L/bin/testvectors_cross-rsdpg-128-balanced_clean
+________ test_testvectors[clean implementation of cross-rsdp-128-fast] _________
+
+implementation = <Implementation(cross-rsdp-128-fast, clean)>
+impl_path = '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__km3SrICU/crypto_bla/scheme/impl'
+test_dir = '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__km3SrICU'
+init = <function isolate_test_files.<locals>.initializer at 0x7f938643d9e0>
+destr = <function isolate_test_files.<locals>.destructor at 0x7f938643db20>
+
+    @pytest.mark.parametrize(
+        'implementation,test_dir,impl_path,init,destr',
+        [(impl, *helpers.isolate_test_files(impl.path(), 'test_testvectors_'))
+         for sig in pqclean.Signature.all_sigs()
+         for impl in sig.implementations],
+        ids=[str(impl) for sig in pqclean.Signature.all_sigs()
+             for impl in sig.implementations],
+    )
+    @helpers.filtered_test
+    def test_testvectors(implementation, impl_path, test_dir, init, destr):
+        if not implementation.supported_on_current_platform():
+            raise unittest.SkipTest("Not supported on current platform")
+        if platform.machine() == 'armv7l' and 'gcc' in os.environ.get('CC', 'gcc') and 'falcon' in implementation.scheme.name:
+            raise unittest.SkipTest("this test hangs for falcon on armv7l with gcc")
+        init()
+        dest_dir = os.path.join(test_dir, 'bin')
+        helpers.make('testvectors',
+                     TYPE=implementation.scheme.type,
+                     SCHEME=implementation.scheme.name,
+                     SCHEME_DIR=impl_path,
+                     IMPLEMENTATION=implementation.name,
+                     DEST_DIR=dest_dir,
+                     working_dir=os.path.join(test_dir, 'test'))
+        out = helpers.run_subprocess(
+            [os.path.join(dest_dir, 'testvectors_{}_{}{}'.format(
+                implementation.scheme.name,
+                implementation.name,
+                '.exe' if os.name == 'nt' else ''
+            ))],
+            print_output=False,
+        ).replace('\r', '')
+>       assert(implementation.scheme.metadata()['testvectors-sha256'].lower()
+               == hashlib.sha256(out.encode('utf-8')).hexdigest().lower())
+E       AssertionError: assert 'b4edd0ca3106...fb38c4f1d916c' == 'a1ae3d02122f...c863fb3632686'
+E         
+E         - a1ae3d02122f1ffa519c7acc994bef1c18ae15d08799af923cac863fb3632686
+E         + b4edd0ca3106c65ed9461eca1b8c490f5e721d72bb208ec817bfb38c4f1d916c
+
+test_testvectors.py:48: AssertionError
+----------------------------- Captured stdout call -----------------------------
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__km3SrICU/test > make TYPE=sign SCHEME=cross-rsdp-128-fast SCHEME_DIR=/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__km3SrICU/crypto_bla/scheme/impl IMPLEMENTATION=clean DEST_DIR=/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__km3SrICU/bin testvectors
+cd /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__km3SrICU/crypto_bla/scheme/impl && make
+make[1]: Entering directory '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__km3SrICU/crypto_bla/scheme/impl'
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o CROSS.o CROSS.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o csprng_hash.o csprng_hash.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o merkle.o merkle.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o pack_unpack.o pack_unpack.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o seedtree.o seedtree.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o sign.o sign.c
+ar -r libcross-rsdp-128-fast_clean.a CROSS.o csprng_hash.o merkle.o pack_unpack.o seedtree.o sign.o
+ar: creating libcross-rsdp-128-fast_clean.a
+make[1]: Leaving directory '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__km3SrICU/crypto_bla/scheme/impl'
+mkdir -p /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__km3SrICU/bin
+cc -O3 -Wall -Wextra -Wpedantic -Wvla -Werror -std=c99 -Wundef -Wshadow -Wcast-align -Wpointer-arith -Wmissing-prototypes -fstrict-aliasing -fno-common -pipe -I../common  -DPQCLEAN_NAMESPACE=PQCLEAN_CROSSRSDP128FAST_CLEAN -I/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__km3SrICU/crypto_bla/scheme/impl crypto_sign/testvectors.c ../common/aes.c ../common/sha2.c ../common/fips202.c ../common/nistseedexpander.c ../common/sp800-185.c ../test/common/notrandombytes.c -o /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__km3SrICU/bin/testvectors_cross-rsdp-128-fast_clean -L/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__km3SrICU/crypto_bla/scheme/impl -lcross-rsdp-128-fast_clean
+
+. > /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__km3SrICU/bin/testvectors_cross-rsdp-128-fast_clean
+_______ test_testvectors[clean implementation of cross-rsdpg-256-small] ________
+
+implementation = <Implementation(cross-rsdpg-256-small, clean)>
+impl_path = '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__eGW0RvnC/crypto_bla/scheme/impl'
+test_dir = '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__eGW0RvnC'
+init = <function isolate_test_files.<locals>.initializer at 0x7f938643dbc0>
+destr = <function isolate_test_files.<locals>.destructor at 0x7f938643dd00>
+
+    @pytest.mark.parametrize(
+        'implementation,test_dir,impl_path,init,destr',
+        [(impl, *helpers.isolate_test_files(impl.path(), 'test_testvectors_'))
+         for sig in pqclean.Signature.all_sigs()
+         for impl in sig.implementations],
+        ids=[str(impl) for sig in pqclean.Signature.all_sigs()
+             for impl in sig.implementations],
+    )
+    @helpers.filtered_test
+    def test_testvectors(implementation, impl_path, test_dir, init, destr):
+        if not implementation.supported_on_current_platform():
+            raise unittest.SkipTest("Not supported on current platform")
+        if platform.machine() == 'armv7l' and 'gcc' in os.environ.get('CC', 'gcc') and 'falcon' in implementation.scheme.name:
+            raise unittest.SkipTest("this test hangs for falcon on armv7l with gcc")
+        init()
+        dest_dir = os.path.join(test_dir, 'bin')
+        helpers.make('testvectors',
+                     TYPE=implementation.scheme.type,
+                     SCHEME=implementation.scheme.name,
+                     SCHEME_DIR=impl_path,
+                     IMPLEMENTATION=implementation.name,
+                     DEST_DIR=dest_dir,
+                     working_dir=os.path.join(test_dir, 'test'))
+        out = helpers.run_subprocess(
+            [os.path.join(dest_dir, 'testvectors_{}_{}{}'.format(
+                implementation.scheme.name,
+                implementation.name,
+                '.exe' if os.name == 'nt' else ''
+            ))],
+            print_output=False,
+        ).replace('\r', '')
+>       assert(implementation.scheme.metadata()['testvectors-sha256'].lower()
+               == hashlib.sha256(out.encode('utf-8')).hexdigest().lower())
+E       AssertionError: assert 'e0192ff31aff...f480914115a02' == '82504b48f35a...afd5ff68a9fc7'
+E         
+E         - 82504b48f35a956fa4d334766e1a69e8d74cd23764af7ebb525afd5ff68a9fc7
+E         + e0192ff31affe5784488568521881eac1cb9efce2a260d4c12bf480914115a02
+
+test_testvectors.py:48: AssertionError
+----------------------------- Captured stdout call -----------------------------
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__eGW0RvnC/test > make TYPE=sign SCHEME=cross-rsdpg-256-small SCHEME_DIR=/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__eGW0RvnC/crypto_bla/scheme/impl IMPLEMENTATION=clean DEST_DIR=/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__eGW0RvnC/bin testvectors
+cd /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__eGW0RvnC/crypto_bla/scheme/impl && make
+make[1]: Entering directory '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__eGW0RvnC/crypto_bla/scheme/impl'
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o CROSS.o CROSS.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o csprng_hash.o csprng_hash.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o merkle.o merkle.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o pack_unpack.o pack_unpack.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o seedtree.o seedtree.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o sign.o sign.c
+ar -r libcross-rsdpg-256-small_clean.a CROSS.o csprng_hash.o merkle.o pack_unpack.o seedtree.o sign.o
+ar: creating libcross-rsdpg-256-small_clean.a
+make[1]: Leaving directory '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__eGW0RvnC/crypto_bla/scheme/impl'
+mkdir -p /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__eGW0RvnC/bin
+cc -O3 -Wall -Wextra -Wpedantic -Wvla -Werror -std=c99 -Wundef -Wshadow -Wcast-align -Wpointer-arith -Wmissing-prototypes -fstrict-aliasing -fno-common -pipe -I../common  -DPQCLEAN_NAMESPACE=PQCLEAN_CROSSRSDPG256SMALL_CLEAN -I/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__eGW0RvnC/crypto_bla/scheme/impl crypto_sign/testvectors.c ../common/aes.c ../common/sha2.c ../common/fips202.c ../common/nistseedexpander.c ../common/sp800-185.c ../test/common/notrandombytes.c -o /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__eGW0RvnC/bin/testvectors_cross-rsdpg-256-small_clean -L/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__eGW0RvnC/crypto_bla/scheme/impl -lcross-rsdpg-256-small_clean
+
+. > /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__eGW0RvnC/bin/testvectors_cross-rsdpg-256-small_clean
+________ test_testvectors[clean implementation of cross-rsdp-256-fast] _________
+
+implementation = <Implementation(cross-rsdp-256-fast, clean)>
+impl_path = '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__0UYcZjia/crypto_bla/scheme/impl'
+test_dir = '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__0UYcZjia'
+init = <function isolate_test_files.<locals>.initializer at 0x7f938643dda0>
+destr = <function isolate_test_files.<locals>.destructor at 0x7f938643dee0>
+
+    @pytest.mark.parametrize(
+        'implementation,test_dir,impl_path,init,destr',
+        [(impl, *helpers.isolate_test_files(impl.path(), 'test_testvectors_'))
+         for sig in pqclean.Signature.all_sigs()
+         for impl in sig.implementations],
+        ids=[str(impl) for sig in pqclean.Signature.all_sigs()
+             for impl in sig.implementations],
+    )
+    @helpers.filtered_test
+    def test_testvectors(implementation, impl_path, test_dir, init, destr):
+        if not implementation.supported_on_current_platform():
+            raise unittest.SkipTest("Not supported on current platform")
+        if platform.machine() == 'armv7l' and 'gcc' in os.environ.get('CC', 'gcc') and 'falcon' in implementation.scheme.name:
+            raise unittest.SkipTest("this test hangs for falcon on armv7l with gcc")
+        init()
+        dest_dir = os.path.join(test_dir, 'bin')
+        helpers.make('testvectors',
+                     TYPE=implementation.scheme.type,
+                     SCHEME=implementation.scheme.name,
+                     SCHEME_DIR=impl_path,
+                     IMPLEMENTATION=implementation.name,
+                     DEST_DIR=dest_dir,
+                     working_dir=os.path.join(test_dir, 'test'))
+        out = helpers.run_subprocess(
+            [os.path.join(dest_dir, 'testvectors_{}_{}{}'.format(
+                implementation.scheme.name,
+                implementation.name,
+                '.exe' if os.name == 'nt' else ''
+            ))],
+            print_output=False,
+        ).replace('\r', '')
+>       assert(implementation.scheme.metadata()['testvectors-sha256'].lower()
+               == hashlib.sha256(out.encode('utf-8')).hexdigest().lower())
+E       AssertionError: assert '0bd9bc73a426...36f17230db08d' == 'cb810b05fe4c...e398366e35846'
+E         
+E         - cb810b05fe4c66a136f6f12461dd27844df0be90b0c7e0b9406e398366e35846
+E         + 0bd9bc73a42608d46af14c963aa772354a563c674eac87cad1736f17230db08d
+
+test_testvectors.py:48: AssertionError
+----------------------------- Captured stdout call -----------------------------
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__0UYcZjia/test > make TYPE=sign SCHEME=cross-rsdp-256-fast SCHEME_DIR=/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__0UYcZjia/crypto_bla/scheme/impl IMPLEMENTATION=clean DEST_DIR=/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__0UYcZjia/bin testvectors
+cd /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__0UYcZjia/crypto_bla/scheme/impl && make
+make[1]: Entering directory '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__0UYcZjia/crypto_bla/scheme/impl'
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o CROSS.o CROSS.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o csprng_hash.o csprng_hash.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o merkle.o merkle.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o pack_unpack.o pack_unpack.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o seedtree.o seedtree.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o sign.o sign.c
+ar -r libcross-rsdp-256-fast_clean.a CROSS.o csprng_hash.o merkle.o pack_unpack.o seedtree.o sign.o
+ar: creating libcross-rsdp-256-fast_clean.a
+make[1]: Leaving directory '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__0UYcZjia/crypto_bla/scheme/impl'
+mkdir -p /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__0UYcZjia/bin
+cc -O3 -Wall -Wextra -Wpedantic -Wvla -Werror -std=c99 -Wundef -Wshadow -Wcast-align -Wpointer-arith -Wmissing-prototypes -fstrict-aliasing -fno-common -pipe -I../common  -DPQCLEAN_NAMESPACE=PQCLEAN_CROSSRSDP256FAST_CLEAN -I/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__0UYcZjia/crypto_bla/scheme/impl crypto_sign/testvectors.c ../common/aes.c ../common/sha2.c ../common/fips202.c ../common/nistseedexpander.c ../common/sp800-185.c ../test/common/notrandombytes.c -o /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__0UYcZjia/bin/testvectors_cross-rsdp-256-fast_clean -L/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__0UYcZjia/crypto_bla/scheme/impl -lcross-rsdp-256-fast_clean
+
+. > /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__0UYcZjia/bin/testvectors_cross-rsdp-256-fast_clean
+________ test_testvectors[clean implementation of cross-rsdpg-256-fast] ________
+
+implementation = <Implementation(cross-rsdpg-256-fast, clean)>
+impl_path = '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__vFcDBL4T/crypto_bla/scheme/impl'
+test_dir = '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__vFcDBL4T'
+init = <function isolate_test_files.<locals>.initializer at 0x7f938643e160>
+destr = <function isolate_test_files.<locals>.destructor at 0x7f938643e2a0>
+
+    @pytest.mark.parametrize(
+        'implementation,test_dir,impl_path,init,destr',
+        [(impl, *helpers.isolate_test_files(impl.path(), 'test_testvectors_'))
+         for sig in pqclean.Signature.all_sigs()
+         for impl in sig.implementations],
+        ids=[str(impl) for sig in pqclean.Signature.all_sigs()
+             for impl in sig.implementations],
+    )
+    @helpers.filtered_test
+    def test_testvectors(implementation, impl_path, test_dir, init, destr):
+        if not implementation.supported_on_current_platform():
+            raise unittest.SkipTest("Not supported on current platform")
+        if platform.machine() == 'armv7l' and 'gcc' in os.environ.get('CC', 'gcc') and 'falcon' in implementation.scheme.name:
+            raise unittest.SkipTest("this test hangs for falcon on armv7l with gcc")
+        init()
+        dest_dir = os.path.join(test_dir, 'bin')
+        helpers.make('testvectors',
+                     TYPE=implementation.scheme.type,
+                     SCHEME=implementation.scheme.name,
+                     SCHEME_DIR=impl_path,
+                     IMPLEMENTATION=implementation.name,
+                     DEST_DIR=dest_dir,
+                     working_dir=os.path.join(test_dir, 'test'))
+        out = helpers.run_subprocess(
+            [os.path.join(dest_dir, 'testvectors_{}_{}{}'.format(
+                implementation.scheme.name,
+                implementation.name,
+                '.exe' if os.name == 'nt' else ''
+            ))],
+            print_output=False,
+        ).replace('\r', '')
+>       assert(implementation.scheme.metadata()['testvectors-sha256'].lower()
+               == hashlib.sha256(out.encode('utf-8')).hexdigest().lower())
+E       AssertionError: assert 'ea22a8fbe1c1...ee3f42b475437' == '0f8ac76707ea...f48a2efa59b0c'
+E         
+E         - 0f8ac76707ea3dc3a0e8fe4168ede32387dfd9fb9550737abc9f48a2efa59b0c
+E         + ea22a8fbe1c1813cf25a9f557260784f7b1f940a5acf07e05a0ee3f42b475437
+
+test_testvectors.py:48: AssertionError
+----------------------------- Captured stdout call -----------------------------
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__vFcDBL4T/test > make TYPE=sign SCHEME=cross-rsdpg-256-fast SCHEME_DIR=/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__vFcDBL4T/crypto_bla/scheme/impl IMPLEMENTATION=clean DEST_DIR=/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__vFcDBL4T/bin testvectors
+cd /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__vFcDBL4T/crypto_bla/scheme/impl && make
+make[1]: Entering directory '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__vFcDBL4T/crypto_bla/scheme/impl'
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o CROSS.o CROSS.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o csprng_hash.o csprng_hash.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o merkle.o merkle.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o pack_unpack.o pack_unpack.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o seedtree.o seedtree.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o sign.o sign.c
+ar -r libcross-rsdpg-256-fast_clean.a CROSS.o csprng_hash.o merkle.o pack_unpack.o seedtree.o sign.o
+ar: creating libcross-rsdpg-256-fast_clean.a
+make[1]: Leaving directory '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__vFcDBL4T/crypto_bla/scheme/impl'
+mkdir -p /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__vFcDBL4T/bin
+cc -O3 -Wall -Wextra -Wpedantic -Wvla -Werror -std=c99 -Wundef -Wshadow -Wcast-align -Wpointer-arith -Wmissing-prototypes -fstrict-aliasing -fno-common -pipe -I../common  -DPQCLEAN_NAMESPACE=PQCLEAN_CROSSRSDPG256FAST_CLEAN -I/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__vFcDBL4T/crypto_bla/scheme/impl crypto_sign/testvectors.c ../common/aes.c ../common/sha2.c ../common/fips202.c ../common/nistseedexpander.c ../common/sp800-185.c ../test/common/notrandombytes.c -o /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__vFcDBL4T/bin/testvectors_cross-rsdpg-256-fast_clean -L/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__vFcDBL4T/crypto_bla/scheme/impl -lcross-rsdpg-256-fast_clean
+
+. > /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__vFcDBL4T/bin/testvectors_cross-rsdpg-256-fast_clean
+________ test_testvectors[clean implementation of cross-rsdpg-192-fast] ________
+
+implementation = <Implementation(cross-rsdpg-192-fast, clean)>
+impl_path = '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__vKL1YMyA/crypto_bla/scheme/impl'
+test_dir = '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__vKL1YMyA'
+init = <function isolate_test_files.<locals>.initializer at 0x7f938643e340>
+destr = <function isolate_test_files.<locals>.destructor at 0x7f938643e480>
+
+    @pytest.mark.parametrize(
+        'implementation,test_dir,impl_path,init,destr',
+        [(impl, *helpers.isolate_test_files(impl.path(), 'test_testvectors_'))
+         for sig in pqclean.Signature.all_sigs()
+         for impl in sig.implementations],
+        ids=[str(impl) for sig in pqclean.Signature.all_sigs()
+             for impl in sig.implementations],
+    )
+    @helpers.filtered_test
+    def test_testvectors(implementation, impl_path, test_dir, init, destr):
+        if not implementation.supported_on_current_platform():
+            raise unittest.SkipTest("Not supported on current platform")
+        if platform.machine() == 'armv7l' and 'gcc' in os.environ.get('CC', 'gcc') and 'falcon' in implementation.scheme.name:
+            raise unittest.SkipTest("this test hangs for falcon on armv7l with gcc")
+        init()
+        dest_dir = os.path.join(test_dir, 'bin')
+        helpers.make('testvectors',
+                     TYPE=implementation.scheme.type,
+                     SCHEME=implementation.scheme.name,
+                     SCHEME_DIR=impl_path,
+                     IMPLEMENTATION=implementation.name,
+                     DEST_DIR=dest_dir,
+                     working_dir=os.path.join(test_dir, 'test'))
+        out = helpers.run_subprocess(
+            [os.path.join(dest_dir, 'testvectors_{}_{}{}'.format(
+                implementation.scheme.name,
+                implementation.name,
+                '.exe' if os.name == 'nt' else ''
+            ))],
+            print_output=False,
+        ).replace('\r', '')
+>       assert(implementation.scheme.metadata()['testvectors-sha256'].lower()
+               == hashlib.sha256(out.encode('utf-8')).hexdigest().lower())
+E       AssertionError: assert '439ac3cdf433...6917ca1156e5b' == '228d498348a9...0c7a55f6e5fd4'
+E         
+E         - 228d498348a9e8c7a6ece353910919ac0063a5a4429da61e8f80c7a55f6e5fd4
+E         + 439ac3cdf433c378f56aaf56ecb6b0691067d2f2faf799c13f86917ca1156e5b
+
+test_testvectors.py:48: AssertionError
+----------------------------- Captured stdout call -----------------------------
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__vKL1YMyA/test > make TYPE=sign SCHEME=cross-rsdpg-192-fast SCHEME_DIR=/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__vKL1YMyA/crypto_bla/scheme/impl IMPLEMENTATION=clean DEST_DIR=/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__vKL1YMyA/bin testvectors
+cd /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__vKL1YMyA/crypto_bla/scheme/impl && make
+make[1]: Entering directory '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__vKL1YMyA/crypto_bla/scheme/impl'
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o CROSS.o CROSS.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o csprng_hash.o csprng_hash.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o merkle.o merkle.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o pack_unpack.o pack_unpack.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o seedtree.o seedtree.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o sign.o sign.c
+ar -r libcross-rsdpg-192-fast_clean.a CROSS.o csprng_hash.o merkle.o pack_unpack.o seedtree.o sign.o
+ar: creating libcross-rsdpg-192-fast_clean.a
+make[1]: Leaving directory '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__vKL1YMyA/crypto_bla/scheme/impl'
+mkdir -p /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__vKL1YMyA/bin
+cc -O3 -Wall -Wextra -Wpedantic -Wvla -Werror -std=c99 -Wundef -Wshadow -Wcast-align -Wpointer-arith -Wmissing-prototypes -fstrict-aliasing -fno-common -pipe -I../common  -DPQCLEAN_NAMESPACE=PQCLEAN_CROSSRSDPG192FAST_CLEAN -I/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__vKL1YMyA/crypto_bla/scheme/impl crypto_sign/testvectors.c ../common/aes.c ../common/sha2.c ../common/fips202.c ../common/nistseedexpander.c ../common/sp800-185.c ../test/common/notrandombytes.c -o /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__vKL1YMyA/bin/testvectors_cross-rsdpg-192-fast_clean -L/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__vKL1YMyA/crypto_bla/scheme/impl -lcross-rsdpg-192-fast_clean
+
+. > /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__vKL1YMyA/bin/testvectors_cross-rsdpg-192-fast_clean
+______ test_testvectors[clean implementation of cross-rsdp-192-balanced] _______
+
+implementation = <Implementation(cross-rsdp-192-balanced, clean)>
+impl_path = '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__E7l9Aif5/crypto_bla/scheme/impl'
+test_dir = '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__E7l9Aif5'
+init = <function isolate_test_files.<locals>.initializer at 0x7f938643e520>
+destr = <function isolate_test_files.<locals>.destructor at 0x7f938643e660>
+
+    @pytest.mark.parametrize(
+        'implementation,test_dir,impl_path,init,destr',
+        [(impl, *helpers.isolate_test_files(impl.path(), 'test_testvectors_'))
+         for sig in pqclean.Signature.all_sigs()
+         for impl in sig.implementations],
+        ids=[str(impl) for sig in pqclean.Signature.all_sigs()
+             for impl in sig.implementations],
+    )
+    @helpers.filtered_test
+    def test_testvectors(implementation, impl_path, test_dir, init, destr):
+        if not implementation.supported_on_current_platform():
+            raise unittest.SkipTest("Not supported on current platform")
+        if platform.machine() == 'armv7l' and 'gcc' in os.environ.get('CC', 'gcc') and 'falcon' in implementation.scheme.name:
+            raise unittest.SkipTest("this test hangs for falcon on armv7l with gcc")
+        init()
+        dest_dir = os.path.join(test_dir, 'bin')
+        helpers.make('testvectors',
+                     TYPE=implementation.scheme.type,
+                     SCHEME=implementation.scheme.name,
+                     SCHEME_DIR=impl_path,
+                     IMPLEMENTATION=implementation.name,
+                     DEST_DIR=dest_dir,
+                     working_dir=os.path.join(test_dir, 'test'))
+        out = helpers.run_subprocess(
+            [os.path.join(dest_dir, 'testvectors_{}_{}{}'.format(
+                implementation.scheme.name,
+                implementation.name,
+                '.exe' if os.name == 'nt' else ''
+            ))],
+            print_output=False,
+        ).replace('\r', '')
+>       assert(implementation.scheme.metadata()['testvectors-sha256'].lower()
+               == hashlib.sha256(out.encode('utf-8')).hexdigest().lower())
+E       AssertionError: assert 'efcbe06716f1...51fe628c53443' == '7391c1e5ec83...3c8215abda033'
+E         
+E         - 7391c1e5ec83ed6694e654a7aec0b8a05b36b4b919e349b8f193c8215abda033
+E         + efcbe06716f132e4143edacfa681260bf5b094499cb893ffd2551fe628c53443
+
+test_testvectors.py:48: AssertionError
+----------------------------- Captured stdout call -----------------------------
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__E7l9Aif5/test > make TYPE=sign SCHEME=cross-rsdp-192-balanced SCHEME_DIR=/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__E7l9Aif5/crypto_bla/scheme/impl IMPLEMENTATION=clean DEST_DIR=/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__E7l9Aif5/bin testvectors
+cd /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__E7l9Aif5/crypto_bla/scheme/impl && make
+make[1]: Entering directory '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__E7l9Aif5/crypto_bla/scheme/impl'
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o CROSS.o CROSS.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o csprng_hash.o csprng_hash.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o merkle.o merkle.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o pack_unpack.o pack_unpack.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o seedtree.o seedtree.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o sign.o sign.c
+ar -r libcross-rsdp-192-balanced_clean.a CROSS.o csprng_hash.o merkle.o pack_unpack.o seedtree.o sign.o
+ar: creating libcross-rsdp-192-balanced_clean.a
+make[1]: Leaving directory '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__E7l9Aif5/crypto_bla/scheme/impl'
+mkdir -p /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__E7l9Aif5/bin
+cc -O3 -Wall -Wextra -Wpedantic -Wvla -Werror -std=c99 -Wundef -Wshadow -Wcast-align -Wpointer-arith -Wmissing-prototypes -fstrict-aliasing -fno-common -pipe -I../common  -DPQCLEAN_NAMESPACE=PQCLEAN_CROSSRSDP192BALANCED_CLEAN -I/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__E7l9Aif5/crypto_bla/scheme/impl crypto_sign/testvectors.c ../common/aes.c ../common/sha2.c ../common/fips202.c ../common/nistseedexpander.c ../common/sp800-185.c ../test/common/notrandombytes.c -o /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__E7l9Aif5/bin/testvectors_cross-rsdp-192-balanced_clean -L/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__E7l9Aif5/crypto_bla/scheme/impl -lcross-rsdp-192-balanced_clean
+
+. > /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__E7l9Aif5/bin/testvectors_cross-rsdp-192-balanced_clean
+_______ test_testvectors[clean implementation of cross-rsdpg-128-small] ________
+
+implementation = <Implementation(cross-rsdpg-128-small, clean)>
+impl_path = '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__TmTSaP9r/crypto_bla/scheme/impl'
+test_dir = '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__TmTSaP9r'
+init = <function isolate_test_files.<locals>.initializer at 0x7f938643e700>
+destr = <function isolate_test_files.<locals>.destructor at 0x7f938643e840>
+
+    @pytest.mark.parametrize(
+        'implementation,test_dir,impl_path,init,destr',
+        [(impl, *helpers.isolate_test_files(impl.path(), 'test_testvectors_'))
+         for sig in pqclean.Signature.all_sigs()
+         for impl in sig.implementations],
+        ids=[str(impl) for sig in pqclean.Signature.all_sigs()
+             for impl in sig.implementations],
+    )
+    @helpers.filtered_test
+    def test_testvectors(implementation, impl_path, test_dir, init, destr):
+        if not implementation.supported_on_current_platform():
+            raise unittest.SkipTest("Not supported on current platform")
+        if platform.machine() == 'armv7l' and 'gcc' in os.environ.get('CC', 'gcc') and 'falcon' in implementation.scheme.name:
+            raise unittest.SkipTest("this test hangs for falcon on armv7l with gcc")
+        init()
+        dest_dir = os.path.join(test_dir, 'bin')
+        helpers.make('testvectors',
+                     TYPE=implementation.scheme.type,
+                     SCHEME=implementation.scheme.name,
+                     SCHEME_DIR=impl_path,
+                     IMPLEMENTATION=implementation.name,
+                     DEST_DIR=dest_dir,
+                     working_dir=os.path.join(test_dir, 'test'))
+        out = helpers.run_subprocess(
+            [os.path.join(dest_dir, 'testvectors_{}_{}{}'.format(
+                implementation.scheme.name,
+                implementation.name,
+                '.exe' if os.name == 'nt' else ''
+            ))],
+            print_output=False,
+        ).replace('\r', '')
+>       assert(implementation.scheme.metadata()['testvectors-sha256'].lower()
+               == hashlib.sha256(out.encode('utf-8')).hexdigest().lower())
+E       AssertionError: assert 'b4e1d1ae7ae9...da8549a7223da' == '960dc718bdff...82b8800c8e462'
+E         
+E         - 960dc718bdff9cc4cc0e4c239df01b50e68d6d5f8c9df0b966882b8800c8e462
+E         + b4e1d1ae7ae92f8aeafe8807f719eb1c8ed7b8288e588d15e4bda8549a7223da
+
+test_testvectors.py:48: AssertionError
+----------------------------- Captured stdout call -----------------------------
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__TmTSaP9r/test > make TYPE=sign SCHEME=cross-rsdpg-128-small SCHEME_DIR=/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__TmTSaP9r/crypto_bla/scheme/impl IMPLEMENTATION=clean DEST_DIR=/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__TmTSaP9r/bin testvectors
+cd /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__TmTSaP9r/crypto_bla/scheme/impl && make
+make[1]: Entering directory '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__TmTSaP9r/crypto_bla/scheme/impl'
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o CROSS.o CROSS.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o csprng_hash.o csprng_hash.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o merkle.o merkle.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o pack_unpack.o pack_unpack.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o seedtree.o seedtree.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o sign.o sign.c
+ar -r libcross-rsdpg-128-small_clean.a CROSS.o csprng_hash.o merkle.o pack_unpack.o seedtree.o sign.o
+ar: creating libcross-rsdpg-128-small_clean.a
+make[1]: Leaving directory '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__TmTSaP9r/crypto_bla/scheme/impl'
+mkdir -p /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__TmTSaP9r/bin
+cc -O3 -Wall -Wextra -Wpedantic -Wvla -Werror -std=c99 -Wundef -Wshadow -Wcast-align -Wpointer-arith -Wmissing-prototypes -fstrict-aliasing -fno-common -pipe -I../common  -DPQCLEAN_NAMESPACE=PQCLEAN_CROSSRSDPG128SMALL_CLEAN -I/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__TmTSaP9r/crypto_bla/scheme/impl crypto_sign/testvectors.c ../common/aes.c ../common/sha2.c ../common/fips202.c ../common/nistseedexpander.c ../common/sp800-185.c ../test/common/notrandombytes.c -o /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__TmTSaP9r/bin/testvectors_cross-rsdpg-128-small_clean -L/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__TmTSaP9r/crypto_bla/scheme/impl -lcross-rsdpg-128-small_clean
+
+. > /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__TmTSaP9r/bin/testvectors_cross-rsdpg-128-small_clean
+________ test_testvectors[clean implementation of cross-rsdpg-128-fast] ________
+
+implementation = <Implementation(cross-rsdpg-128-fast, clean)>
+impl_path = '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__ow2F7mIl/crypto_bla/scheme/impl'
+test_dir = '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__ow2F7mIl'
+init = <function isolate_test_files.<locals>.initializer at 0x7f938643e8e0>
+destr = <function isolate_test_files.<locals>.destructor at 0x7f938643ea20>
+
+    @pytest.mark.parametrize(
+        'implementation,test_dir,impl_path,init,destr',
+        [(impl, *helpers.isolate_test_files(impl.path(), 'test_testvectors_'))
+         for sig in pqclean.Signature.all_sigs()
+         for impl in sig.implementations],
+        ids=[str(impl) for sig in pqclean.Signature.all_sigs()
+             for impl in sig.implementations],
+    )
+    @helpers.filtered_test
+    def test_testvectors(implementation, impl_path, test_dir, init, destr):
+        if not implementation.supported_on_current_platform():
+            raise unittest.SkipTest("Not supported on current platform")
+        if platform.machine() == 'armv7l' and 'gcc' in os.environ.get('CC', 'gcc') and 'falcon' in implementation.scheme.name:
+            raise unittest.SkipTest("this test hangs for falcon on armv7l with gcc")
+        init()
+        dest_dir = os.path.join(test_dir, 'bin')
+        helpers.make('testvectors',
+                     TYPE=implementation.scheme.type,
+                     SCHEME=implementation.scheme.name,
+                     SCHEME_DIR=impl_path,
+                     IMPLEMENTATION=implementation.name,
+                     DEST_DIR=dest_dir,
+                     working_dir=os.path.join(test_dir, 'test'))
+        out = helpers.run_subprocess(
+            [os.path.join(dest_dir, 'testvectors_{}_{}{}'.format(
+                implementation.scheme.name,
+                implementation.name,
+                '.exe' if os.name == 'nt' else ''
+            ))],
+            print_output=False,
+        ).replace('\r', '')
+>       assert(implementation.scheme.metadata()['testvectors-sha256'].lower()
+               == hashlib.sha256(out.encode('utf-8')).hexdigest().lower())
+E       AssertionError: assert '95531b182ca9...c0357075bbc99' == 'd18fa79ecc59...7e6354d0dcba4'
+E         
+E         - d18fa79ecc59a84c2f6cdec097d41c5ac720896835c54f243157e6354d0dcba4
+E         + 95531b182ca9345b2018f5bb50ce454b7c150b19fa0d1c379e6c0357075bbc99
+
+test_testvectors.py:48: AssertionError
+----------------------------- Captured stdout call -----------------------------
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__ow2F7mIl/test > make TYPE=sign SCHEME=cross-rsdpg-128-fast SCHEME_DIR=/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__ow2F7mIl/crypto_bla/scheme/impl IMPLEMENTATION=clean DEST_DIR=/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__ow2F7mIl/bin testvectors
+cd /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__ow2F7mIl/crypto_bla/scheme/impl && make
+make[1]: Entering directory '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__ow2F7mIl/crypto_bla/scheme/impl'
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o CROSS.o CROSS.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o csprng_hash.o csprng_hash.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o merkle.o merkle.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o pack_unpack.o pack_unpack.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o seedtree.o seedtree.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o sign.o sign.c
+ar -r libcross-rsdpg-128-fast_clean.a CROSS.o csprng_hash.o merkle.o pack_unpack.o seedtree.o sign.o
+ar: creating libcross-rsdpg-128-fast_clean.a
+make[1]: Leaving directory '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__ow2F7mIl/crypto_bla/scheme/impl'
+mkdir -p /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__ow2F7mIl/bin
+cc -O3 -Wall -Wextra -Wpedantic -Wvla -Werror -std=c99 -Wundef -Wshadow -Wcast-align -Wpointer-arith -Wmissing-prototypes -fstrict-aliasing -fno-common -pipe -I../common  -DPQCLEAN_NAMESPACE=PQCLEAN_CROSSRSDPG128FAST_CLEAN -I/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__ow2F7mIl/crypto_bla/scheme/impl crypto_sign/testvectors.c ../common/aes.c ../common/sha2.c ../common/fips202.c ../common/nistseedexpander.c ../common/sp800-185.c ../test/common/notrandombytes.c -o /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__ow2F7mIl/bin/testvectors_cross-rsdpg-128-fast_clean -L/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__ow2F7mIl/crypto_bla/scheme/impl -lcross-rsdpg-128-fast_clean
+
+. > /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__ow2F7mIl/bin/testvectors_cross-rsdpg-128-fast_clean
+________ test_testvectors[clean implementation of cross-rsdp-256-small] ________
+
+implementation = <Implementation(cross-rsdp-256-small, clean)>
+impl_path = '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__s4fPgftr/crypto_bla/scheme/impl'
+test_dir = '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__s4fPgftr'
+init = <function isolate_test_files.<locals>.initializer at 0x7f938643eac0>
+destr = <function isolate_test_files.<locals>.destructor at 0x7f938643ec00>
+
+    @pytest.mark.parametrize(
+        'implementation,test_dir,impl_path,init,destr',
+        [(impl, *helpers.isolate_test_files(impl.path(), 'test_testvectors_'))
+         for sig in pqclean.Signature.all_sigs()
+         for impl in sig.implementations],
+        ids=[str(impl) for sig in pqclean.Signature.all_sigs()
+             for impl in sig.implementations],
+    )
+    @helpers.filtered_test
+    def test_testvectors(implementation, impl_path, test_dir, init, destr):
+        if not implementation.supported_on_current_platform():
+            raise unittest.SkipTest("Not supported on current platform")
+        if platform.machine() == 'armv7l' and 'gcc' in os.environ.get('CC', 'gcc') and 'falcon' in implementation.scheme.name:
+            raise unittest.SkipTest("this test hangs for falcon on armv7l with gcc")
+        init()
+        dest_dir = os.path.join(test_dir, 'bin')
+        helpers.make('testvectors',
+                     TYPE=implementation.scheme.type,
+                     SCHEME=implementation.scheme.name,
+                     SCHEME_DIR=impl_path,
+                     IMPLEMENTATION=implementation.name,
+                     DEST_DIR=dest_dir,
+                     working_dir=os.path.join(test_dir, 'test'))
+        out = helpers.run_subprocess(
+            [os.path.join(dest_dir, 'testvectors_{}_{}{}'.format(
+                implementation.scheme.name,
+                implementation.name,
+                '.exe' if os.name == 'nt' else ''
+            ))],
+            print_output=False,
+        ).replace('\r', '')
+>       assert(implementation.scheme.metadata()['testvectors-sha256'].lower()
+               == hashlib.sha256(out.encode('utf-8')).hexdigest().lower())
+E       AssertionError: assert '856f16c5fefa...43b63424937b5' == 'fa44aed8b94b...2a2754cc6634c'
+E         
+E         - fa44aed8b94bf124cb663097671f1a3ba14f29da6ce1e3fd4b12a2754cc6634c
+E         + 856f16c5fefa0cb71eecbdd8292b8944d300a6a8fb5c36d657943b63424937b5
+
+test_testvectors.py:48: AssertionError
+----------------------------- Captured stdout call -----------------------------
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__s4fPgftr/test > make TYPE=sign SCHEME=cross-rsdp-256-small SCHEME_DIR=/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__s4fPgftr/crypto_bla/scheme/impl IMPLEMENTATION=clean DEST_DIR=/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__s4fPgftr/bin testvectors
+cd /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__s4fPgftr/crypto_bla/scheme/impl && make
+make[1]: Entering directory '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__s4fPgftr/crypto_bla/scheme/impl'
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o CROSS.o CROSS.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o csprng_hash.o csprng_hash.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o merkle.o merkle.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o pack_unpack.o pack_unpack.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o seedtree.o seedtree.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o sign.o sign.c
+ar -r libcross-rsdp-256-small_clean.a CROSS.o csprng_hash.o merkle.o pack_unpack.o seedtree.o sign.o
+ar: creating libcross-rsdp-256-small_clean.a
+make[1]: Leaving directory '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__s4fPgftr/crypto_bla/scheme/impl'
+mkdir -p /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__s4fPgftr/bin
+cc -O3 -Wall -Wextra -Wpedantic -Wvla -Werror -std=c99 -Wundef -Wshadow -Wcast-align -Wpointer-arith -Wmissing-prototypes -fstrict-aliasing -fno-common -pipe -I../common  -DPQCLEAN_NAMESPACE=PQCLEAN_CROSSRSDP256SMALL_CLEAN -I/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__s4fPgftr/crypto_bla/scheme/impl crypto_sign/testvectors.c ../common/aes.c ../common/sha2.c ../common/fips202.c ../common/nistseedexpander.c ../common/sp800-185.c ../test/common/notrandombytes.c -o /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__s4fPgftr/bin/testvectors_cross-rsdp-256-small_clean -L/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__s4fPgftr/crypto_bla/scheme/impl -lcross-rsdp-256-small_clean
+
+. > /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__s4fPgftr/bin/testvectors_cross-rsdp-256-small_clean
+______ test_testvectors[clean implementation of cross-rsdpg-192-balanced] ______
+
+implementation = <Implementation(cross-rsdpg-192-balanced, clean)>
+impl_path = '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__8AbIkpcs/crypto_bla/scheme/impl'
+test_dir = '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__8AbIkpcs'
+init = <function isolate_test_files.<locals>.initializer at 0x7f938643eca0>
+destr = <function isolate_test_files.<locals>.destructor at 0x7f938643ede0>
+
+    @pytest.mark.parametrize(
+        'implementation,test_dir,impl_path,init,destr',
+        [(impl, *helpers.isolate_test_files(impl.path(), 'test_testvectors_'))
+         for sig in pqclean.Signature.all_sigs()
+         for impl in sig.implementations],
+        ids=[str(impl) for sig in pqclean.Signature.all_sigs()
+             for impl in sig.implementations],
+    )
+    @helpers.filtered_test
+    def test_testvectors(implementation, impl_path, test_dir, init, destr):
+        if not implementation.supported_on_current_platform():
+            raise unittest.SkipTest("Not supported on current platform")
+        if platform.machine() == 'armv7l' and 'gcc' in os.environ.get('CC', 'gcc') and 'falcon' in implementation.scheme.name:
+            raise unittest.SkipTest("this test hangs for falcon on armv7l with gcc")
+        init()
+        dest_dir = os.path.join(test_dir, 'bin')
+        helpers.make('testvectors',
+                     TYPE=implementation.scheme.type,
+                     SCHEME=implementation.scheme.name,
+                     SCHEME_DIR=impl_path,
+                     IMPLEMENTATION=implementation.name,
+                     DEST_DIR=dest_dir,
+                     working_dir=os.path.join(test_dir, 'test'))
+        out = helpers.run_subprocess(
+            [os.path.join(dest_dir, 'testvectors_{}_{}{}'.format(
+                implementation.scheme.name,
+                implementation.name,
+                '.exe' if os.name == 'nt' else ''
+            ))],
+            print_output=False,
+        ).replace('\r', '')
+>       assert(implementation.scheme.metadata()['testvectors-sha256'].lower()
+               == hashlib.sha256(out.encode('utf-8')).hexdigest().lower())
+E       AssertionError: assert '0e3b3fed7d99...4587d07e67d4e' == 'c54342f34b14...f3f9d1486e1e9'
+E         
+E         - c54342f34b1458ba20d809695763654b7d693d69432d28af7fdf3f9d1486e1e9
+E         + 0e3b3fed7d99f822c52ac46419f5257b8cc5703a7b9967ae41c4587d07e67d4e
+
+test_testvectors.py:48: AssertionError
+----------------------------- Captured stdout call -----------------------------
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__8AbIkpcs/test > make TYPE=sign SCHEME=cross-rsdpg-192-balanced SCHEME_DIR=/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__8AbIkpcs/crypto_bla/scheme/impl IMPLEMENTATION=clean DEST_DIR=/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__8AbIkpcs/bin testvectors
+cd /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__8AbIkpcs/crypto_bla/scheme/impl && make
+make[1]: Entering directory '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__8AbIkpcs/crypto_bla/scheme/impl'
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o CROSS.o CROSS.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o csprng_hash.o csprng_hash.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o merkle.o merkle.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o pack_unpack.o pack_unpack.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o seedtree.o seedtree.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o sign.o sign.c
+ar -r libcross-rsdpg-192-balanced_clean.a CROSS.o csprng_hash.o merkle.o pack_unpack.o seedtree.o sign.o
+ar: creating libcross-rsdpg-192-balanced_clean.a
+make[1]: Leaving directory '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__8AbIkpcs/crypto_bla/scheme/impl'
+mkdir -p /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__8AbIkpcs/bin
+cc -O3 -Wall -Wextra -Wpedantic -Wvla -Werror -std=c99 -Wundef -Wshadow -Wcast-align -Wpointer-arith -Wmissing-prototypes -fstrict-aliasing -fno-common -pipe -I../common  -DPQCLEAN_NAMESPACE=PQCLEAN_CROSSRSDPG192BALANCED_CLEAN -I/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__8AbIkpcs/crypto_bla/scheme/impl crypto_sign/testvectors.c ../common/aes.c ../common/sha2.c ../common/fips202.c ../common/nistseedexpander.c ../common/sp800-185.c ../test/common/notrandombytes.c -o /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__8AbIkpcs/bin/testvectors_cross-rsdpg-192-balanced_clean -L/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__8AbIkpcs/crypto_bla/scheme/impl -lcross-rsdpg-192-balanced_clean
+
+. > /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_testvectors__8AbIkpcs/bin/testvectors_cross-rsdpg-192-balanced_clean
+=========================== short test summary info ============================
+FAILED test_testvectors.py::test_testvectors[clean implementation of cross-rsdpg-256-balanced]
+FAILED test_testvectors.py::test_testvectors[clean implementation of cross-rsdp-192-fast]
+FAILED test_testvectors.py::test_testvectors[clean implementation of cross-rsdp-192-small]
+FAILED test_testvectors.py::test_testvectors[clean implementation of cross-rsdpg-192-small]
+FAILED test_testvectors.py::test_testvectors[clean implementation of cross-rsdp-128-small]
+FAILED test_testvectors.py::test_testvectors[clean implementation of cross-rsdp-256-balanced]
+FAILED test_testvectors.py::test_testvectors[clean implementation of cross-rsdpg-128-balanced]
+FAILED test_testvectors.py::test_testvectors[clean implementation of cross-rsdp-128-fast]
+FAILED test_testvectors.py::test_testvectors[clean implementation of cross-rsdpg-256-small]
+FAILED test_testvectors.py::test_testvectors[clean implementation of cross-rsdp-256-fast]
+FAILED test_testvectors.py::test_testvectors[clean implementation of cross-rsdpg-256-fast]
+FAILED test_testvectors.py::test_testvectors[clean implementation of cross-rsdpg-192-fast]
+FAILED test_testvectors.py::test_testvectors[clean implementation of cross-rsdp-192-balanced]
+FAILED test_testvectors.py::test_testvectors[clean implementation of cross-rsdpg-128-small]
+FAILED test_testvectors.py::test_testvectors[clean implementation of cross-rsdpg-128-fast]
+FAILED test_testvectors.py::test_testvectors[clean implementation of cross-rsdp-256-small]
+FAILED test_testvectors.py::test_testvectors[clean implementation of cross-rsdpg-192-balanced]
+=================== 17 failed, 1 passed in 96.60s (0:01:36) ====================

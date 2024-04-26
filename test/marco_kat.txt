@@ -1,0 +1,1117 @@
+============================= test session starts ==============================
+platform linux -- Python 3.11.2, pytest-8.1.1, pluggy-1.4.0
+rootdir: /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test
+configfile: pytest.ini
+plugins: xdist-3.5.0
+collected 18 items
+
+test_nistkat.py FFFFFFFFFF.FFFFFFF                                       [100%]
+
+=================================== FAILURES ===================================
+________ test_nistkat[clean implementation of cross-rsdpg-256-balanced] ________
+
+implementation = <Implementation(cross-rsdpg-256-balanced, clean)>
+impl_path = '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__UJGN5net/crypto_bla/scheme/impl'
+test_dir = '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__UJGN5net'
+init = <function isolate_test_files.<locals>.initializer at 0x7f35992445e0>
+destr = <function isolate_test_files.<locals>.destructor at 0x7f3599244680>
+
+    @pytest.mark.parametrize(
+        'implementation,test_dir,impl_path, init, destr',
+        [(impl, *helpers.isolate_test_files(impl.path(), 'test_functest_'))
+         for impl in pqclean.Scheme.all_supported_implementations()],
+        ids=[str(impl) for impl in pqclean.Scheme.all_supported_implementations()],
+    )
+    @helpers.filtered_test
+    def test_nistkat(implementation, impl_path, test_dir, init, destr):
+        if platform.machine() == 'armv7l' and 'gcc' in os.environ.get('CC', 'gcc') and 'falcon' in implementation.scheme.name:
+            raise unittest.SkipTest("this test hangs for falcon on armv7l with gcc")
+        init()
+        dest_path = os.path.join(test_dir, 'bin')
+        kat_rng = 'nist'
+        if 'nistkat-rng' in implementation.scheme.metadata():
+            kat_rng = implementation.scheme.metadata()['nistkat-rng']
+        helpers.make('nistkat',
+                     TYPE=implementation.scheme.type,
+                     SCHEME=implementation.scheme.name,
+                     IMPLEMENTATION=implementation.name,
+                     SCHEME_DIR=impl_path,
+                     DEST_DIR=dest_path,
+                     KAT_RNG=kat_rng,
+                     working_dir=os.path.join(test_dir, 'test'))
+        out = helpers.run_subprocess(
+            [os.path.join(dest_path, 'nistkat_{}_{}{}'.format(
+                implementation.scheme.name,
+                implementation.name,
+                '.exe' if os.name == 'nt' else ''
+            ))],
+            print_output=False,
+        ).replace('\r', '')
+>       assert(implementation.scheme.metadata()['nistkat-sha256'].lower()
+               == hashlib.sha256(out.encode('utf-8')).hexdigest().lower())
+E       AssertionError: assert '0d2120b5de15...25e0b1438022e' == '3548522e5eeb...2fcb0367290c0'
+E         
+E         - 3548522e5eeb0610c6ad138e43b05a29b802038630e819469d32fcb0367290c0
+E         + 0d2120b5de153681206f15f220a0df2e09743a1f3cf88b5fa0725e0b1438022e
+
+test_nistkat.py:53: AssertionError
+----------------------------- Captured stdout call -----------------------------
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__UJGN5net/test > make TYPE=sign SCHEME=cross-rsdpg-256-balanced IMPLEMENTATION=clean SCHEME_DIR=/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__UJGN5net/crypto_bla/scheme/impl DEST_DIR=/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__UJGN5net/bin KAT_RNG=nist nistkat
+cd /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__UJGN5net/crypto_bla/scheme/impl && make
+make[1]: Entering directory '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__UJGN5net/crypto_bla/scheme/impl'
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o CROSS.o CROSS.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o csprng_hash.o csprng_hash.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o merkle.o merkle.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o pack_unpack.o pack_unpack.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o seedtree.o seedtree.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o sign.o sign.c
+ar -r libcross-rsdpg-256-balanced_clean.a CROSS.o csprng_hash.o merkle.o pack_unpack.o seedtree.o sign.o
+ar: creating libcross-rsdpg-256-balanced_clean.a
+make[1]: Leaving directory '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__UJGN5net/crypto_bla/scheme/impl'
+mkdir -p /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__UJGN5net/bin
+cc -O3 -Wall -Wextra -Wpedantic -Wvla -Werror -std=c99 -Wundef -Wshadow -Wcast-align -Wpointer-arith -Wmissing-prototypes -fstrict-aliasing -fno-common -pipe -I../common  -DPQCLEAN_NAMESPACE=PQCLEAN_CROSSRSDPG256BALANCED_CLEAN -I/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__UJGN5net/crypto_bla/scheme/impl crypto_sign/nistkat.c ../common/aes.c ../common/sha2.c ../common/fips202.c ../common/nistseedexpander.c ../common/sp800-185.c ../test/common/nistkatrng.c -o /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__UJGN5net/bin/nistkat_cross-rsdpg-256-balanced_clean -L/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__UJGN5net/crypto_bla/scheme/impl -lcross-rsdpg-256-balanced_clean
+
+. > /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__UJGN5net/bin/nistkat_cross-rsdpg-256-balanced_clean
+__________ test_nistkat[clean implementation of cross-rsdp-192-fast] ___________
+
+implementation = <Implementation(cross-rsdp-192-fast, clean)>
+impl_path = '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__AN7X9wj0/crypto_bla/scheme/impl'
+test_dir = '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__AN7X9wj0'
+init = <function isolate_test_files.<locals>.initializer at 0x7f3599244720>
+destr = <function isolate_test_files.<locals>.destructor at 0x7f35992447c0>
+
+    @pytest.mark.parametrize(
+        'implementation,test_dir,impl_path, init, destr',
+        [(impl, *helpers.isolate_test_files(impl.path(), 'test_functest_'))
+         for impl in pqclean.Scheme.all_supported_implementations()],
+        ids=[str(impl) for impl in pqclean.Scheme.all_supported_implementations()],
+    )
+    @helpers.filtered_test
+    def test_nistkat(implementation, impl_path, test_dir, init, destr):
+        if platform.machine() == 'armv7l' and 'gcc' in os.environ.get('CC', 'gcc') and 'falcon' in implementation.scheme.name:
+            raise unittest.SkipTest("this test hangs for falcon on armv7l with gcc")
+        init()
+        dest_path = os.path.join(test_dir, 'bin')
+        kat_rng = 'nist'
+        if 'nistkat-rng' in implementation.scheme.metadata():
+            kat_rng = implementation.scheme.metadata()['nistkat-rng']
+        helpers.make('nistkat',
+                     TYPE=implementation.scheme.type,
+                     SCHEME=implementation.scheme.name,
+                     IMPLEMENTATION=implementation.name,
+                     SCHEME_DIR=impl_path,
+                     DEST_DIR=dest_path,
+                     KAT_RNG=kat_rng,
+                     working_dir=os.path.join(test_dir, 'test'))
+        out = helpers.run_subprocess(
+            [os.path.join(dest_path, 'nistkat_{}_{}{}'.format(
+                implementation.scheme.name,
+                implementation.name,
+                '.exe' if os.name == 'nt' else ''
+            ))],
+            print_output=False,
+        ).replace('\r', '')
+>       assert(implementation.scheme.metadata()['nistkat-sha256'].lower()
+               == hashlib.sha256(out.encode('utf-8')).hexdigest().lower())
+E       AssertionError: assert '5c5902f3d2d3...596839677384a' == 'fffeade77ea9...8a8d61e8267f9'
+E         
+E         - fffeade77ea90fdee48b7f6d6e1b0767d5010acf703299ef65a8a8d61e8267f9
+E         + 5c5902f3d2d3797a1da8136c43ebffebfdd9e762c558046b9b3596839677384a
+
+test_nistkat.py:53: AssertionError
+----------------------------- Captured stdout call -----------------------------
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__AN7X9wj0/test > make TYPE=sign SCHEME=cross-rsdp-192-fast IMPLEMENTATION=clean SCHEME_DIR=/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__AN7X9wj0/crypto_bla/scheme/impl DEST_DIR=/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__AN7X9wj0/bin KAT_RNG=nist nistkat
+cd /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__AN7X9wj0/crypto_bla/scheme/impl && make
+make[1]: Entering directory '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__AN7X9wj0/crypto_bla/scheme/impl'
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o CROSS.o CROSS.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o csprng_hash.o csprng_hash.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o merkle.o merkle.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o pack_unpack.o pack_unpack.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o seedtree.o seedtree.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o sign.o sign.c
+ar -r libcross-rsdp-192-fast_clean.a CROSS.o csprng_hash.o merkle.o pack_unpack.o seedtree.o sign.o
+ar: creating libcross-rsdp-192-fast_clean.a
+make[1]: Leaving directory '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__AN7X9wj0/crypto_bla/scheme/impl'
+mkdir -p /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__AN7X9wj0/bin
+cc -O3 -Wall -Wextra -Wpedantic -Wvla -Werror -std=c99 -Wundef -Wshadow -Wcast-align -Wpointer-arith -Wmissing-prototypes -fstrict-aliasing -fno-common -pipe -I../common  -DPQCLEAN_NAMESPACE=PQCLEAN_CROSSRSDP192FAST_CLEAN -I/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__AN7X9wj0/crypto_bla/scheme/impl crypto_sign/nistkat.c ../common/aes.c ../common/sha2.c ../common/fips202.c ../common/nistseedexpander.c ../common/sp800-185.c ../test/common/nistkatrng.c -o /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__AN7X9wj0/bin/nistkat_cross-rsdp-192-fast_clean -L/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__AN7X9wj0/crypto_bla/scheme/impl -lcross-rsdp-192-fast_clean
+
+. > /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__AN7X9wj0/bin/nistkat_cross-rsdp-192-fast_clean
+__________ test_nistkat[clean implementation of cross-rsdp-192-small] __________
+
+implementation = <Implementation(cross-rsdp-192-small, clean)>
+impl_path = '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__aR0o6tGJ/crypto_bla/scheme/impl'
+test_dir = '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__aR0o6tGJ'
+init = <function isolate_test_files.<locals>.initializer at 0x7f3599244860>
+destr = <function isolate_test_files.<locals>.destructor at 0x7f3599244900>
+
+    @pytest.mark.parametrize(
+        'implementation,test_dir,impl_path, init, destr',
+        [(impl, *helpers.isolate_test_files(impl.path(), 'test_functest_'))
+         for impl in pqclean.Scheme.all_supported_implementations()],
+        ids=[str(impl) for impl in pqclean.Scheme.all_supported_implementations()],
+    )
+    @helpers.filtered_test
+    def test_nistkat(implementation, impl_path, test_dir, init, destr):
+        if platform.machine() == 'armv7l' and 'gcc' in os.environ.get('CC', 'gcc') and 'falcon' in implementation.scheme.name:
+            raise unittest.SkipTest("this test hangs for falcon on armv7l with gcc")
+        init()
+        dest_path = os.path.join(test_dir, 'bin')
+        kat_rng = 'nist'
+        if 'nistkat-rng' in implementation.scheme.metadata():
+            kat_rng = implementation.scheme.metadata()['nistkat-rng']
+        helpers.make('nistkat',
+                     TYPE=implementation.scheme.type,
+                     SCHEME=implementation.scheme.name,
+                     IMPLEMENTATION=implementation.name,
+                     SCHEME_DIR=impl_path,
+                     DEST_DIR=dest_path,
+                     KAT_RNG=kat_rng,
+                     working_dir=os.path.join(test_dir, 'test'))
+        out = helpers.run_subprocess(
+            [os.path.join(dest_path, 'nistkat_{}_{}{}'.format(
+                implementation.scheme.name,
+                implementation.name,
+                '.exe' if os.name == 'nt' else ''
+            ))],
+            print_output=False,
+        ).replace('\r', '')
+>       assert(implementation.scheme.metadata()['nistkat-sha256'].lower()
+               == hashlib.sha256(out.encode('utf-8')).hexdigest().lower())
+E       AssertionError: assert '3dd9d4c3f611...8011976a8417d' == '67f3b7e24f8d...0d6864088eedf'
+E         
+E         - 67f3b7e24f8d28227bb9e51b1ba0d712ea9ab62b3161b743af30d6864088eedf
+E         + 3dd9d4c3f611abb8ea2ebbaf4465e516854169eb92b22a26b7f8011976a8417d
+
+test_nistkat.py:53: AssertionError
+----------------------------- Captured stdout call -----------------------------
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__aR0o6tGJ/test > make TYPE=sign SCHEME=cross-rsdp-192-small IMPLEMENTATION=clean SCHEME_DIR=/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__aR0o6tGJ/crypto_bla/scheme/impl DEST_DIR=/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__aR0o6tGJ/bin KAT_RNG=nist nistkat
+cd /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__aR0o6tGJ/crypto_bla/scheme/impl && make
+make[1]: Entering directory '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__aR0o6tGJ/crypto_bla/scheme/impl'
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o CROSS.o CROSS.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o csprng_hash.o csprng_hash.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o merkle.o merkle.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o pack_unpack.o pack_unpack.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o seedtree.o seedtree.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o sign.o sign.c
+ar -r libcross-rsdp-192-small_clean.a CROSS.o csprng_hash.o merkle.o pack_unpack.o seedtree.o sign.o
+ar: creating libcross-rsdp-192-small_clean.a
+make[1]: Leaving directory '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__aR0o6tGJ/crypto_bla/scheme/impl'
+mkdir -p /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__aR0o6tGJ/bin
+cc -O3 -Wall -Wextra -Wpedantic -Wvla -Werror -std=c99 -Wundef -Wshadow -Wcast-align -Wpointer-arith -Wmissing-prototypes -fstrict-aliasing -fno-common -pipe -I../common  -DPQCLEAN_NAMESPACE=PQCLEAN_CROSSRSDP192SMALL_CLEAN -I/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__aR0o6tGJ/crypto_bla/scheme/impl crypto_sign/nistkat.c ../common/aes.c ../common/sha2.c ../common/fips202.c ../common/nistseedexpander.c ../common/sp800-185.c ../test/common/nistkatrng.c -o /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__aR0o6tGJ/bin/nistkat_cross-rsdp-192-small_clean -L/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__aR0o6tGJ/crypto_bla/scheme/impl -lcross-rsdp-192-small_clean
+
+. > /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__aR0o6tGJ/bin/nistkat_cross-rsdp-192-small_clean
+_________ test_nistkat[clean implementation of cross-rsdpg-192-small] __________
+
+implementation = <Implementation(cross-rsdpg-192-small, clean)>
+impl_path = '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__P4wmy_r2/crypto_bla/scheme/impl'
+test_dir = '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__P4wmy_r2'
+init = <function isolate_test_files.<locals>.initializer at 0x7f35992449a0>
+destr = <function isolate_test_files.<locals>.destructor at 0x7f3599244a40>
+
+    @pytest.mark.parametrize(
+        'implementation,test_dir,impl_path, init, destr',
+        [(impl, *helpers.isolate_test_files(impl.path(), 'test_functest_'))
+         for impl in pqclean.Scheme.all_supported_implementations()],
+        ids=[str(impl) for impl in pqclean.Scheme.all_supported_implementations()],
+    )
+    @helpers.filtered_test
+    def test_nistkat(implementation, impl_path, test_dir, init, destr):
+        if platform.machine() == 'armv7l' and 'gcc' in os.environ.get('CC', 'gcc') and 'falcon' in implementation.scheme.name:
+            raise unittest.SkipTest("this test hangs for falcon on armv7l with gcc")
+        init()
+        dest_path = os.path.join(test_dir, 'bin')
+        kat_rng = 'nist'
+        if 'nistkat-rng' in implementation.scheme.metadata():
+            kat_rng = implementation.scheme.metadata()['nistkat-rng']
+        helpers.make('nistkat',
+                     TYPE=implementation.scheme.type,
+                     SCHEME=implementation.scheme.name,
+                     IMPLEMENTATION=implementation.name,
+                     SCHEME_DIR=impl_path,
+                     DEST_DIR=dest_path,
+                     KAT_RNG=kat_rng,
+                     working_dir=os.path.join(test_dir, 'test'))
+        out = helpers.run_subprocess(
+            [os.path.join(dest_path, 'nistkat_{}_{}{}'.format(
+                implementation.scheme.name,
+                implementation.name,
+                '.exe' if os.name == 'nt' else ''
+            ))],
+            print_output=False,
+        ).replace('\r', '')
+>       assert(implementation.scheme.metadata()['nistkat-sha256'].lower()
+               == hashlib.sha256(out.encode('utf-8')).hexdigest().lower())
+E       AssertionError: assert 'd51d8a0ce6ec...c94daa6adbe59' == 'ee6a6c6c7cbc...c6bdf19b971be'
+E         
+E         - ee6a6c6c7cbcdd3ab0fcebba39ae3cd024ae34a599ed1e974eec6bdf19b971be
+E         + d51d8a0ce6ec20380bcac20ecdf0017afbd90ff6f2066e36fdec94daa6adbe59
+
+test_nistkat.py:53: AssertionError
+----------------------------- Captured stdout call -----------------------------
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__P4wmy_r2/test > make TYPE=sign SCHEME=cross-rsdpg-192-small IMPLEMENTATION=clean SCHEME_DIR=/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__P4wmy_r2/crypto_bla/scheme/impl DEST_DIR=/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__P4wmy_r2/bin KAT_RNG=nist nistkat
+cd /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__P4wmy_r2/crypto_bla/scheme/impl && make
+make[1]: Entering directory '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__P4wmy_r2/crypto_bla/scheme/impl'
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o CROSS.o CROSS.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o csprng_hash.o csprng_hash.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o merkle.o merkle.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o pack_unpack.o pack_unpack.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o seedtree.o seedtree.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o sign.o sign.c
+ar -r libcross-rsdpg-192-small_clean.a CROSS.o csprng_hash.o merkle.o pack_unpack.o seedtree.o sign.o
+ar: creating libcross-rsdpg-192-small_clean.a
+make[1]: Leaving directory '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__P4wmy_r2/crypto_bla/scheme/impl'
+mkdir -p /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__P4wmy_r2/bin
+cc -O3 -Wall -Wextra -Wpedantic -Wvla -Werror -std=c99 -Wundef -Wshadow -Wcast-align -Wpointer-arith -Wmissing-prototypes -fstrict-aliasing -fno-common -pipe -I../common  -DPQCLEAN_NAMESPACE=PQCLEAN_CROSSRSDPG192SMALL_CLEAN -I/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__P4wmy_r2/crypto_bla/scheme/impl crypto_sign/nistkat.c ../common/aes.c ../common/sha2.c ../common/fips202.c ../common/nistseedexpander.c ../common/sp800-185.c ../test/common/nistkatrng.c -o /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__P4wmy_r2/bin/nistkat_cross-rsdpg-192-small_clean -L/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__P4wmy_r2/crypto_bla/scheme/impl -lcross-rsdpg-192-small_clean
+
+. > /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__P4wmy_r2/bin/nistkat_cross-rsdpg-192-small_clean
+__________ test_nistkat[clean implementation of cross-rsdp-128-small] __________
+
+implementation = <Implementation(cross-rsdp-128-small, clean)>
+impl_path = '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__lO45mdTZ/crypto_bla/scheme/impl'
+test_dir = '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__lO45mdTZ'
+init = <function isolate_test_files.<locals>.initializer at 0x7f3599244ae0>
+destr = <function isolate_test_files.<locals>.destructor at 0x7f3599244b80>
+
+    @pytest.mark.parametrize(
+        'implementation,test_dir,impl_path, init, destr',
+        [(impl, *helpers.isolate_test_files(impl.path(), 'test_functest_'))
+         for impl in pqclean.Scheme.all_supported_implementations()],
+        ids=[str(impl) for impl in pqclean.Scheme.all_supported_implementations()],
+    )
+    @helpers.filtered_test
+    def test_nistkat(implementation, impl_path, test_dir, init, destr):
+        if platform.machine() == 'armv7l' and 'gcc' in os.environ.get('CC', 'gcc') and 'falcon' in implementation.scheme.name:
+            raise unittest.SkipTest("this test hangs for falcon on armv7l with gcc")
+        init()
+        dest_path = os.path.join(test_dir, 'bin')
+        kat_rng = 'nist'
+        if 'nistkat-rng' in implementation.scheme.metadata():
+            kat_rng = implementation.scheme.metadata()['nistkat-rng']
+        helpers.make('nistkat',
+                     TYPE=implementation.scheme.type,
+                     SCHEME=implementation.scheme.name,
+                     IMPLEMENTATION=implementation.name,
+                     SCHEME_DIR=impl_path,
+                     DEST_DIR=dest_path,
+                     KAT_RNG=kat_rng,
+                     working_dir=os.path.join(test_dir, 'test'))
+        out = helpers.run_subprocess(
+            [os.path.join(dest_path, 'nistkat_{}_{}{}'.format(
+                implementation.scheme.name,
+                implementation.name,
+                '.exe' if os.name == 'nt' else ''
+            ))],
+            print_output=False,
+        ).replace('\r', '')
+>       assert(implementation.scheme.metadata()['nistkat-sha256'].lower()
+               == hashlib.sha256(out.encode('utf-8')).hexdigest().lower())
+E       AssertionError: assert '61514039467c...9a9e0b4611a45' == 'ecdb831bfe6a...60444220207e2'
+E         
+E         - ecdb831bfe6a8bb5a42ab2cba07036610aea642d025fc8cc09360444220207e2
+E         + 61514039467c0eeaac75306ed2ecc6d9b37b4be46fc303c4cc49a9e0b4611a45
+
+test_nistkat.py:53: AssertionError
+----------------------------- Captured stdout call -----------------------------
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__lO45mdTZ/test > make TYPE=sign SCHEME=cross-rsdp-128-small IMPLEMENTATION=clean SCHEME_DIR=/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__lO45mdTZ/crypto_bla/scheme/impl DEST_DIR=/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__lO45mdTZ/bin KAT_RNG=nist nistkat
+cd /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__lO45mdTZ/crypto_bla/scheme/impl && make
+make[1]: Entering directory '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__lO45mdTZ/crypto_bla/scheme/impl'
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o CROSS.o CROSS.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o csprng_hash.o csprng_hash.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o merkle.o merkle.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o pack_unpack.o pack_unpack.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o seedtree.o seedtree.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o sign.o sign.c
+ar -r libcross-rsdp-128-small_clean.a CROSS.o csprng_hash.o merkle.o pack_unpack.o seedtree.o sign.o
+ar: creating libcross-rsdp-128-small_clean.a
+make[1]: Leaving directory '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__lO45mdTZ/crypto_bla/scheme/impl'
+mkdir -p /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__lO45mdTZ/bin
+cc -O3 -Wall -Wextra -Wpedantic -Wvla -Werror -std=c99 -Wundef -Wshadow -Wcast-align -Wpointer-arith -Wmissing-prototypes -fstrict-aliasing -fno-common -pipe -I../common  -DPQCLEAN_NAMESPACE=PQCLEAN_CROSSRSDP128SMALL_CLEAN -I/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__lO45mdTZ/crypto_bla/scheme/impl crypto_sign/nistkat.c ../common/aes.c ../common/sha2.c ../common/fips202.c ../common/nistseedexpander.c ../common/sp800-185.c ../test/common/nistkatrng.c -o /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__lO45mdTZ/bin/nistkat_cross-rsdp-128-small_clean -L/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__lO45mdTZ/crypto_bla/scheme/impl -lcross-rsdp-128-small_clean
+
+. > /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__lO45mdTZ/bin/nistkat_cross-rsdp-128-small_clean
+________ test_nistkat[clean implementation of cross-rsdp-256-balanced] _________
+
+implementation = <Implementation(cross-rsdp-256-balanced, clean)>
+impl_path = '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__CSs7CaJm/crypto_bla/scheme/impl'
+test_dir = '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__CSs7CaJm'
+init = <function isolate_test_files.<locals>.initializer at 0x7f3599244c20>
+destr = <function isolate_test_files.<locals>.destructor at 0x7f3599244cc0>
+
+    @pytest.mark.parametrize(
+        'implementation,test_dir,impl_path, init, destr',
+        [(impl, *helpers.isolate_test_files(impl.path(), 'test_functest_'))
+         for impl in pqclean.Scheme.all_supported_implementations()],
+        ids=[str(impl) for impl in pqclean.Scheme.all_supported_implementations()],
+    )
+    @helpers.filtered_test
+    def test_nistkat(implementation, impl_path, test_dir, init, destr):
+        if platform.machine() == 'armv7l' and 'gcc' in os.environ.get('CC', 'gcc') and 'falcon' in implementation.scheme.name:
+            raise unittest.SkipTest("this test hangs for falcon on armv7l with gcc")
+        init()
+        dest_path = os.path.join(test_dir, 'bin')
+        kat_rng = 'nist'
+        if 'nistkat-rng' in implementation.scheme.metadata():
+            kat_rng = implementation.scheme.metadata()['nistkat-rng']
+        helpers.make('nistkat',
+                     TYPE=implementation.scheme.type,
+                     SCHEME=implementation.scheme.name,
+                     IMPLEMENTATION=implementation.name,
+                     SCHEME_DIR=impl_path,
+                     DEST_DIR=dest_path,
+                     KAT_RNG=kat_rng,
+                     working_dir=os.path.join(test_dir, 'test'))
+        out = helpers.run_subprocess(
+            [os.path.join(dest_path, 'nistkat_{}_{}{}'.format(
+                implementation.scheme.name,
+                implementation.name,
+                '.exe' if os.name == 'nt' else ''
+            ))],
+            print_output=False,
+        ).replace('\r', '')
+>       assert(implementation.scheme.metadata()['nistkat-sha256'].lower()
+               == hashlib.sha256(out.encode('utf-8')).hexdigest().lower())
+E       AssertionError: assert 'd58926fc1660...ae97891d495ca' == '37ff515d6b11...03ccd0123a02f'
+E         
+E         - 37ff515d6b111f814f34ee08470420a4ca1614db105baca47f003ccd0123a02f
+E         + d58926fc1660250ad8ca6ff4ffb34a1ac5b0398477bd2b3854aae97891d495ca
+
+test_nistkat.py:53: AssertionError
+----------------------------- Captured stdout call -----------------------------
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__CSs7CaJm/test > make TYPE=sign SCHEME=cross-rsdp-256-balanced IMPLEMENTATION=clean SCHEME_DIR=/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__CSs7CaJm/crypto_bla/scheme/impl DEST_DIR=/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__CSs7CaJm/bin KAT_RNG=nist nistkat
+cd /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__CSs7CaJm/crypto_bla/scheme/impl && make
+make[1]: Entering directory '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__CSs7CaJm/crypto_bla/scheme/impl'
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o CROSS.o CROSS.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o csprng_hash.o csprng_hash.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o merkle.o merkle.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o pack_unpack.o pack_unpack.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o seedtree.o seedtree.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o sign.o sign.c
+ar -r libcross-rsdp-256-balanced_clean.a CROSS.o csprng_hash.o merkle.o pack_unpack.o seedtree.o sign.o
+ar: creating libcross-rsdp-256-balanced_clean.a
+make[1]: Leaving directory '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__CSs7CaJm/crypto_bla/scheme/impl'
+mkdir -p /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__CSs7CaJm/bin
+cc -O3 -Wall -Wextra -Wpedantic -Wvla -Werror -std=c99 -Wundef -Wshadow -Wcast-align -Wpointer-arith -Wmissing-prototypes -fstrict-aliasing -fno-common -pipe -I../common  -DPQCLEAN_NAMESPACE=PQCLEAN_CROSSRSDP256BALANCED_CLEAN -I/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__CSs7CaJm/crypto_bla/scheme/impl crypto_sign/nistkat.c ../common/aes.c ../common/sha2.c ../common/fips202.c ../common/nistseedexpander.c ../common/sp800-185.c ../test/common/nistkatrng.c -o /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__CSs7CaJm/bin/nistkat_cross-rsdp-256-balanced_clean -L/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__CSs7CaJm/crypto_bla/scheme/impl -lcross-rsdp-256-balanced_clean
+
+. > /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__CSs7CaJm/bin/nistkat_cross-rsdp-256-balanced_clean
+________ test_nistkat[clean implementation of cross-rsdpg-128-balanced] ________
+
+implementation = <Implementation(cross-rsdpg-128-balanced, clean)>
+impl_path = '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__ExRIv6Bf/crypto_bla/scheme/impl'
+test_dir = '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__ExRIv6Bf'
+init = <function isolate_test_files.<locals>.initializer at 0x7f3599244d60>
+destr = <function isolate_test_files.<locals>.destructor at 0x7f3599244e00>
+
+    @pytest.mark.parametrize(
+        'implementation,test_dir,impl_path, init, destr',
+        [(impl, *helpers.isolate_test_files(impl.path(), 'test_functest_'))
+         for impl in pqclean.Scheme.all_supported_implementations()],
+        ids=[str(impl) for impl in pqclean.Scheme.all_supported_implementations()],
+    )
+    @helpers.filtered_test
+    def test_nistkat(implementation, impl_path, test_dir, init, destr):
+        if platform.machine() == 'armv7l' and 'gcc' in os.environ.get('CC', 'gcc') and 'falcon' in implementation.scheme.name:
+            raise unittest.SkipTest("this test hangs for falcon on armv7l with gcc")
+        init()
+        dest_path = os.path.join(test_dir, 'bin')
+        kat_rng = 'nist'
+        if 'nistkat-rng' in implementation.scheme.metadata():
+            kat_rng = implementation.scheme.metadata()['nistkat-rng']
+        helpers.make('nistkat',
+                     TYPE=implementation.scheme.type,
+                     SCHEME=implementation.scheme.name,
+                     IMPLEMENTATION=implementation.name,
+                     SCHEME_DIR=impl_path,
+                     DEST_DIR=dest_path,
+                     KAT_RNG=kat_rng,
+                     working_dir=os.path.join(test_dir, 'test'))
+        out = helpers.run_subprocess(
+            [os.path.join(dest_path, 'nistkat_{}_{}{}'.format(
+                implementation.scheme.name,
+                implementation.name,
+                '.exe' if os.name == 'nt' else ''
+            ))],
+            print_output=False,
+        ).replace('\r', '')
+>       assert(implementation.scheme.metadata()['nistkat-sha256'].lower()
+               == hashlib.sha256(out.encode('utf-8')).hexdigest().lower())
+E       AssertionError: assert 'ea62b4c9476b...32602000d9fdb' == 'af484813ca0f...0cf3c8a4fbdf1'
+E         
+E         - af484813ca0f75c21c3237dbbb40202d8be63670608b4eb6a260cf3c8a4fbdf1
+E         + ea62b4c9476b2065cb7440d4cac63f98c493ee9a0f14718958932602000d9fdb
+
+test_nistkat.py:53: AssertionError
+----------------------------- Captured stdout call -----------------------------
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__ExRIv6Bf/test > make TYPE=sign SCHEME=cross-rsdpg-128-balanced IMPLEMENTATION=clean SCHEME_DIR=/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__ExRIv6Bf/crypto_bla/scheme/impl DEST_DIR=/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__ExRIv6Bf/bin KAT_RNG=nist nistkat
+cd /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__ExRIv6Bf/crypto_bla/scheme/impl && make
+make[1]: Entering directory '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__ExRIv6Bf/crypto_bla/scheme/impl'
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o CROSS.o CROSS.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o csprng_hash.o csprng_hash.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o merkle.o merkle.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o pack_unpack.o pack_unpack.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o seedtree.o seedtree.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o sign.o sign.c
+ar -r libcross-rsdpg-128-balanced_clean.a CROSS.o csprng_hash.o merkle.o pack_unpack.o seedtree.o sign.o
+ar: creating libcross-rsdpg-128-balanced_clean.a
+make[1]: Leaving directory '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__ExRIv6Bf/crypto_bla/scheme/impl'
+mkdir -p /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__ExRIv6Bf/bin
+cc -O3 -Wall -Wextra -Wpedantic -Wvla -Werror -std=c99 -Wundef -Wshadow -Wcast-align -Wpointer-arith -Wmissing-prototypes -fstrict-aliasing -fno-common -pipe -I../common  -DPQCLEAN_NAMESPACE=PQCLEAN_CROSSRSDPG128BALANCED_CLEAN -I/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__ExRIv6Bf/crypto_bla/scheme/impl crypto_sign/nistkat.c ../common/aes.c ../common/sha2.c ../common/fips202.c ../common/nistseedexpander.c ../common/sp800-185.c ../test/common/nistkatrng.c -o /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__ExRIv6Bf/bin/nistkat_cross-rsdpg-128-balanced_clean -L/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__ExRIv6Bf/crypto_bla/scheme/impl -lcross-rsdpg-128-balanced_clean
+
+. > /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__ExRIv6Bf/bin/nistkat_cross-rsdpg-128-balanced_clean
+__________ test_nistkat[clean implementation of cross-rsdp-128-fast] ___________
+
+implementation = <Implementation(cross-rsdp-128-fast, clean)>
+impl_path = '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__ypvCpUls/crypto_bla/scheme/impl'
+test_dir = '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__ypvCpUls'
+init = <function isolate_test_files.<locals>.initializer at 0x7f3599244ea0>
+destr = <function isolate_test_files.<locals>.destructor at 0x7f3599244f40>
+
+    @pytest.mark.parametrize(
+        'implementation,test_dir,impl_path, init, destr',
+        [(impl, *helpers.isolate_test_files(impl.path(), 'test_functest_'))
+         for impl in pqclean.Scheme.all_supported_implementations()],
+        ids=[str(impl) for impl in pqclean.Scheme.all_supported_implementations()],
+    )
+    @helpers.filtered_test
+    def test_nistkat(implementation, impl_path, test_dir, init, destr):
+        if platform.machine() == 'armv7l' and 'gcc' in os.environ.get('CC', 'gcc') and 'falcon' in implementation.scheme.name:
+            raise unittest.SkipTest("this test hangs for falcon on armv7l with gcc")
+        init()
+        dest_path = os.path.join(test_dir, 'bin')
+        kat_rng = 'nist'
+        if 'nistkat-rng' in implementation.scheme.metadata():
+            kat_rng = implementation.scheme.metadata()['nistkat-rng']
+        helpers.make('nistkat',
+                     TYPE=implementation.scheme.type,
+                     SCHEME=implementation.scheme.name,
+                     IMPLEMENTATION=implementation.name,
+                     SCHEME_DIR=impl_path,
+                     DEST_DIR=dest_path,
+                     KAT_RNG=kat_rng,
+                     working_dir=os.path.join(test_dir, 'test'))
+        out = helpers.run_subprocess(
+            [os.path.join(dest_path, 'nistkat_{}_{}{}'.format(
+                implementation.scheme.name,
+                implementation.name,
+                '.exe' if os.name == 'nt' else ''
+            ))],
+            print_output=False,
+        ).replace('\r', '')
+>       assert(implementation.scheme.metadata()['nistkat-sha256'].lower()
+               == hashlib.sha256(out.encode('utf-8')).hexdigest().lower())
+E       AssertionError: assert '7d85c661d8da...dc87d39232f5f' == '28e7b80b09b4...5c7aaac8ae47b'
+E         
+E         - 28e7b80b09b4ef5c2ddefbd092afa2ece8312a0e2d42415deae5c7aaac8ae47b
+E         + 7d85c661d8da5e00952fe45dc890c8d4216641df41455dc54d5dc87d39232f5f
+
+test_nistkat.py:53: AssertionError
+----------------------------- Captured stdout call -----------------------------
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__ypvCpUls/test > make TYPE=sign SCHEME=cross-rsdp-128-fast IMPLEMENTATION=clean SCHEME_DIR=/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__ypvCpUls/crypto_bla/scheme/impl DEST_DIR=/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__ypvCpUls/bin KAT_RNG=nist nistkat
+cd /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__ypvCpUls/crypto_bla/scheme/impl && make
+make[1]: Entering directory '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__ypvCpUls/crypto_bla/scheme/impl'
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o CROSS.o CROSS.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o csprng_hash.o csprng_hash.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o merkle.o merkle.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o pack_unpack.o pack_unpack.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o seedtree.o seedtree.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o sign.o sign.c
+ar -r libcross-rsdp-128-fast_clean.a CROSS.o csprng_hash.o merkle.o pack_unpack.o seedtree.o sign.o
+ar: creating libcross-rsdp-128-fast_clean.a
+make[1]: Leaving directory '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__ypvCpUls/crypto_bla/scheme/impl'
+mkdir -p /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__ypvCpUls/bin
+cc -O3 -Wall -Wextra -Wpedantic -Wvla -Werror -std=c99 -Wundef -Wshadow -Wcast-align -Wpointer-arith -Wmissing-prototypes -fstrict-aliasing -fno-common -pipe -I../common  -DPQCLEAN_NAMESPACE=PQCLEAN_CROSSRSDP128FAST_CLEAN -I/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__ypvCpUls/crypto_bla/scheme/impl crypto_sign/nistkat.c ../common/aes.c ../common/sha2.c ../common/fips202.c ../common/nistseedexpander.c ../common/sp800-185.c ../test/common/nistkatrng.c -o /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__ypvCpUls/bin/nistkat_cross-rsdp-128-fast_clean -L/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__ypvCpUls/crypto_bla/scheme/impl -lcross-rsdp-128-fast_clean
+
+. > /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__ypvCpUls/bin/nistkat_cross-rsdp-128-fast_clean
+_________ test_nistkat[clean implementation of cross-rsdpg-256-small] __________
+
+implementation = <Implementation(cross-rsdpg-256-small, clean)>
+impl_path = '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__ZPdJFNQd/crypto_bla/scheme/impl'
+test_dir = '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__ZPdJFNQd'
+init = <function isolate_test_files.<locals>.initializer at 0x7f3599244fe0>
+destr = <function isolate_test_files.<locals>.destructor at 0x7f3599245080>
+
+    @pytest.mark.parametrize(
+        'implementation,test_dir,impl_path, init, destr',
+        [(impl, *helpers.isolate_test_files(impl.path(), 'test_functest_'))
+         for impl in pqclean.Scheme.all_supported_implementations()],
+        ids=[str(impl) for impl in pqclean.Scheme.all_supported_implementations()],
+    )
+    @helpers.filtered_test
+    def test_nistkat(implementation, impl_path, test_dir, init, destr):
+        if platform.machine() == 'armv7l' and 'gcc' in os.environ.get('CC', 'gcc') and 'falcon' in implementation.scheme.name:
+            raise unittest.SkipTest("this test hangs for falcon on armv7l with gcc")
+        init()
+        dest_path = os.path.join(test_dir, 'bin')
+        kat_rng = 'nist'
+        if 'nistkat-rng' in implementation.scheme.metadata():
+            kat_rng = implementation.scheme.metadata()['nistkat-rng']
+        helpers.make('nistkat',
+                     TYPE=implementation.scheme.type,
+                     SCHEME=implementation.scheme.name,
+                     IMPLEMENTATION=implementation.name,
+                     SCHEME_DIR=impl_path,
+                     DEST_DIR=dest_path,
+                     KAT_RNG=kat_rng,
+                     working_dir=os.path.join(test_dir, 'test'))
+        out = helpers.run_subprocess(
+            [os.path.join(dest_path, 'nistkat_{}_{}{}'.format(
+                implementation.scheme.name,
+                implementation.name,
+                '.exe' if os.name == 'nt' else ''
+            ))],
+            print_output=False,
+        ).replace('\r', '')
+>       assert(implementation.scheme.metadata()['nistkat-sha256'].lower()
+               == hashlib.sha256(out.encode('utf-8')).hexdigest().lower())
+E       AssertionError: assert '3e1982acafaf...93116846fdf66' == '6067cf820cee...baac322bde667'
+E         
+E         - 6067cf820cee06f4ecbe58dd648d7d489aba4b83e9fca4b2113baac322bde667
+E         + 3e1982acafafa4cfb3a10295214d2bf257906bf9139acbe02c593116846fdf66
+
+test_nistkat.py:53: AssertionError
+----------------------------- Captured stdout call -----------------------------
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__ZPdJFNQd/test > make TYPE=sign SCHEME=cross-rsdpg-256-small IMPLEMENTATION=clean SCHEME_DIR=/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__ZPdJFNQd/crypto_bla/scheme/impl DEST_DIR=/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__ZPdJFNQd/bin KAT_RNG=nist nistkat
+cd /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__ZPdJFNQd/crypto_bla/scheme/impl && make
+make[1]: Entering directory '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__ZPdJFNQd/crypto_bla/scheme/impl'
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o CROSS.o CROSS.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o csprng_hash.o csprng_hash.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o merkle.o merkle.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o pack_unpack.o pack_unpack.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o seedtree.o seedtree.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o sign.o sign.c
+ar -r libcross-rsdpg-256-small_clean.a CROSS.o csprng_hash.o merkle.o pack_unpack.o seedtree.o sign.o
+ar: creating libcross-rsdpg-256-small_clean.a
+make[1]: Leaving directory '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__ZPdJFNQd/crypto_bla/scheme/impl'
+mkdir -p /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__ZPdJFNQd/bin
+cc -O3 -Wall -Wextra -Wpedantic -Wvla -Werror -std=c99 -Wundef -Wshadow -Wcast-align -Wpointer-arith -Wmissing-prototypes -fstrict-aliasing -fno-common -pipe -I../common  -DPQCLEAN_NAMESPACE=PQCLEAN_CROSSRSDPG256SMALL_CLEAN -I/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__ZPdJFNQd/crypto_bla/scheme/impl crypto_sign/nistkat.c ../common/aes.c ../common/sha2.c ../common/fips202.c ../common/nistseedexpander.c ../common/sp800-185.c ../test/common/nistkatrng.c -o /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__ZPdJFNQd/bin/nistkat_cross-rsdpg-256-small_clean -L/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__ZPdJFNQd/crypto_bla/scheme/impl -lcross-rsdpg-256-small_clean
+
+. > /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__ZPdJFNQd/bin/nistkat_cross-rsdpg-256-small_clean
+__________ test_nistkat[clean implementation of cross-rsdp-256-fast] ___________
+
+implementation = <Implementation(cross-rsdp-256-fast, clean)>
+impl_path = '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__1H9dyUsp/crypto_bla/scheme/impl'
+test_dir = '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__1H9dyUsp'
+init = <function isolate_test_files.<locals>.initializer at 0x7f3599245120>
+destr = <function isolate_test_files.<locals>.destructor at 0x7f35992451c0>
+
+    @pytest.mark.parametrize(
+        'implementation,test_dir,impl_path, init, destr',
+        [(impl, *helpers.isolate_test_files(impl.path(), 'test_functest_'))
+         for impl in pqclean.Scheme.all_supported_implementations()],
+        ids=[str(impl) for impl in pqclean.Scheme.all_supported_implementations()],
+    )
+    @helpers.filtered_test
+    def test_nistkat(implementation, impl_path, test_dir, init, destr):
+        if platform.machine() == 'armv7l' and 'gcc' in os.environ.get('CC', 'gcc') and 'falcon' in implementation.scheme.name:
+            raise unittest.SkipTest("this test hangs for falcon on armv7l with gcc")
+        init()
+        dest_path = os.path.join(test_dir, 'bin')
+        kat_rng = 'nist'
+        if 'nistkat-rng' in implementation.scheme.metadata():
+            kat_rng = implementation.scheme.metadata()['nistkat-rng']
+        helpers.make('nistkat',
+                     TYPE=implementation.scheme.type,
+                     SCHEME=implementation.scheme.name,
+                     IMPLEMENTATION=implementation.name,
+                     SCHEME_DIR=impl_path,
+                     DEST_DIR=dest_path,
+                     KAT_RNG=kat_rng,
+                     working_dir=os.path.join(test_dir, 'test'))
+        out = helpers.run_subprocess(
+            [os.path.join(dest_path, 'nistkat_{}_{}{}'.format(
+                implementation.scheme.name,
+                implementation.name,
+                '.exe' if os.name == 'nt' else ''
+            ))],
+            print_output=False,
+        ).replace('\r', '')
+>       assert(implementation.scheme.metadata()['nistkat-sha256'].lower()
+               == hashlib.sha256(out.encode('utf-8')).hexdigest().lower())
+E       AssertionError: assert '6367164c6bb5...17f197a77f3cb' == 'fe74d3adfc2f...d84de38a2fa6a'
+E         
+E         - fe74d3adfc2fd3081f570c10f9517be958a54f3fb7ed87a363ad84de38a2fa6a
+E         + 6367164c6bb5194dc87f0e71edf5d3b151ae296e6adb20c20e217f197a77f3cb
+
+test_nistkat.py:53: AssertionError
+----------------------------- Captured stdout call -----------------------------
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__1H9dyUsp/test > make TYPE=sign SCHEME=cross-rsdp-256-fast IMPLEMENTATION=clean SCHEME_DIR=/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__1H9dyUsp/crypto_bla/scheme/impl DEST_DIR=/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__1H9dyUsp/bin KAT_RNG=nist nistkat
+cd /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__1H9dyUsp/crypto_bla/scheme/impl && make
+make[1]: Entering directory '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__1H9dyUsp/crypto_bla/scheme/impl'
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o CROSS.o CROSS.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o csprng_hash.o csprng_hash.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o merkle.o merkle.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o pack_unpack.o pack_unpack.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o seedtree.o seedtree.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o sign.o sign.c
+ar -r libcross-rsdp-256-fast_clean.a CROSS.o csprng_hash.o merkle.o pack_unpack.o seedtree.o sign.o
+ar: creating libcross-rsdp-256-fast_clean.a
+make[1]: Leaving directory '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__1H9dyUsp/crypto_bla/scheme/impl'
+mkdir -p /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__1H9dyUsp/bin
+cc -O3 -Wall -Wextra -Wpedantic -Wvla -Werror -std=c99 -Wundef -Wshadow -Wcast-align -Wpointer-arith -Wmissing-prototypes -fstrict-aliasing -fno-common -pipe -I../common  -DPQCLEAN_NAMESPACE=PQCLEAN_CROSSRSDP256FAST_CLEAN -I/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__1H9dyUsp/crypto_bla/scheme/impl crypto_sign/nistkat.c ../common/aes.c ../common/sha2.c ../common/fips202.c ../common/nistseedexpander.c ../common/sp800-185.c ../test/common/nistkatrng.c -o /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__1H9dyUsp/bin/nistkat_cross-rsdp-256-fast_clean -L/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__1H9dyUsp/crypto_bla/scheme/impl -lcross-rsdp-256-fast_clean
+
+. > /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__1H9dyUsp/bin/nistkat_cross-rsdp-256-fast_clean
+__________ test_nistkat[clean implementation of cross-rsdpg-256-fast] __________
+
+implementation = <Implementation(cross-rsdpg-256-fast, clean)>
+impl_path = '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__3fzxm_Va/crypto_bla/scheme/impl'
+test_dir = '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__3fzxm_Va'
+init = <function isolate_test_files.<locals>.initializer at 0x7f35992453a0>
+destr = <function isolate_test_files.<locals>.destructor at 0x7f3599245440>
+
+    @pytest.mark.parametrize(
+        'implementation,test_dir,impl_path, init, destr',
+        [(impl, *helpers.isolate_test_files(impl.path(), 'test_functest_'))
+         for impl in pqclean.Scheme.all_supported_implementations()],
+        ids=[str(impl) for impl in pqclean.Scheme.all_supported_implementations()],
+    )
+    @helpers.filtered_test
+    def test_nistkat(implementation, impl_path, test_dir, init, destr):
+        if platform.machine() == 'armv7l' and 'gcc' in os.environ.get('CC', 'gcc') and 'falcon' in implementation.scheme.name:
+            raise unittest.SkipTest("this test hangs for falcon on armv7l with gcc")
+        init()
+        dest_path = os.path.join(test_dir, 'bin')
+        kat_rng = 'nist'
+        if 'nistkat-rng' in implementation.scheme.metadata():
+            kat_rng = implementation.scheme.metadata()['nistkat-rng']
+        helpers.make('nistkat',
+                     TYPE=implementation.scheme.type,
+                     SCHEME=implementation.scheme.name,
+                     IMPLEMENTATION=implementation.name,
+                     SCHEME_DIR=impl_path,
+                     DEST_DIR=dest_path,
+                     KAT_RNG=kat_rng,
+                     working_dir=os.path.join(test_dir, 'test'))
+        out = helpers.run_subprocess(
+            [os.path.join(dest_path, 'nistkat_{}_{}{}'.format(
+                implementation.scheme.name,
+                implementation.name,
+                '.exe' if os.name == 'nt' else ''
+            ))],
+            print_output=False,
+        ).replace('\r', '')
+>       assert(implementation.scheme.metadata()['nistkat-sha256'].lower()
+               == hashlib.sha256(out.encode('utf-8')).hexdigest().lower())
+E       AssertionError: assert '0374312247c7...dbf1c1eda28c7' == '0e86f6bcc36a...d1f4db66647f2'
+E         
+E         - 0e86f6bcc36a4781f19d463ec5cc520237f148ca1bcbba8d07fd1f4db66647f2
+E         + 0374312247c70abca3fff494f0bd795404cda9b0ad2ddcbbcfadbf1c1eda28c7
+
+test_nistkat.py:53: AssertionError
+----------------------------- Captured stdout call -----------------------------
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__3fzxm_Va/test > make TYPE=sign SCHEME=cross-rsdpg-256-fast IMPLEMENTATION=clean SCHEME_DIR=/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__3fzxm_Va/crypto_bla/scheme/impl DEST_DIR=/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__3fzxm_Va/bin KAT_RNG=nist nistkat
+cd /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__3fzxm_Va/crypto_bla/scheme/impl && make
+make[1]: Entering directory '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__3fzxm_Va/crypto_bla/scheme/impl'
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o CROSS.o CROSS.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o csprng_hash.o csprng_hash.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o merkle.o merkle.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o pack_unpack.o pack_unpack.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o seedtree.o seedtree.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o sign.o sign.c
+ar -r libcross-rsdpg-256-fast_clean.a CROSS.o csprng_hash.o merkle.o pack_unpack.o seedtree.o sign.o
+ar: creating libcross-rsdpg-256-fast_clean.a
+make[1]: Leaving directory '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__3fzxm_Va/crypto_bla/scheme/impl'
+mkdir -p /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__3fzxm_Va/bin
+cc -O3 -Wall -Wextra -Wpedantic -Wvla -Werror -std=c99 -Wundef -Wshadow -Wcast-align -Wpointer-arith -Wmissing-prototypes -fstrict-aliasing -fno-common -pipe -I../common  -DPQCLEAN_NAMESPACE=PQCLEAN_CROSSRSDPG256FAST_CLEAN -I/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__3fzxm_Va/crypto_bla/scheme/impl crypto_sign/nistkat.c ../common/aes.c ../common/sha2.c ../common/fips202.c ../common/nistseedexpander.c ../common/sp800-185.c ../test/common/nistkatrng.c -o /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__3fzxm_Va/bin/nistkat_cross-rsdpg-256-fast_clean -L/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__3fzxm_Va/crypto_bla/scheme/impl -lcross-rsdpg-256-fast_clean
+
+. > /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__3fzxm_Va/bin/nistkat_cross-rsdpg-256-fast_clean
+__________ test_nistkat[clean implementation of cross-rsdpg-192-fast] __________
+
+implementation = <Implementation(cross-rsdpg-192-fast, clean)>
+impl_path = '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__8rNMzFfr/crypto_bla/scheme/impl'
+test_dir = '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__8rNMzFfr'
+init = <function isolate_test_files.<locals>.initializer at 0x7f35992454e0>
+destr = <function isolate_test_files.<locals>.destructor at 0x7f3599245580>
+
+    @pytest.mark.parametrize(
+        'implementation,test_dir,impl_path, init, destr',
+        [(impl, *helpers.isolate_test_files(impl.path(), 'test_functest_'))
+         for impl in pqclean.Scheme.all_supported_implementations()],
+        ids=[str(impl) for impl in pqclean.Scheme.all_supported_implementations()],
+    )
+    @helpers.filtered_test
+    def test_nistkat(implementation, impl_path, test_dir, init, destr):
+        if platform.machine() == 'armv7l' and 'gcc' in os.environ.get('CC', 'gcc') and 'falcon' in implementation.scheme.name:
+            raise unittest.SkipTest("this test hangs for falcon on armv7l with gcc")
+        init()
+        dest_path = os.path.join(test_dir, 'bin')
+        kat_rng = 'nist'
+        if 'nistkat-rng' in implementation.scheme.metadata():
+            kat_rng = implementation.scheme.metadata()['nistkat-rng']
+        helpers.make('nistkat',
+                     TYPE=implementation.scheme.type,
+                     SCHEME=implementation.scheme.name,
+                     IMPLEMENTATION=implementation.name,
+                     SCHEME_DIR=impl_path,
+                     DEST_DIR=dest_path,
+                     KAT_RNG=kat_rng,
+                     working_dir=os.path.join(test_dir, 'test'))
+        out = helpers.run_subprocess(
+            [os.path.join(dest_path, 'nistkat_{}_{}{}'.format(
+                implementation.scheme.name,
+                implementation.name,
+                '.exe' if os.name == 'nt' else ''
+            ))],
+            print_output=False,
+        ).replace('\r', '')
+>       assert(implementation.scheme.metadata()['nistkat-sha256'].lower()
+               == hashlib.sha256(out.encode('utf-8')).hexdigest().lower())
+E       AssertionError: assert '68f52f59e76c...5f8b1564982e1' == 'b893b6cc8350...4f490f8305930'
+E         
+E         - b893b6cc835090fa78c22bfb426b22cfb615386f338670123b14f490f8305930
+E         + 68f52f59e76ce74d6d2b7999e4a08c1322a49e2aae05e1ef8855f8b1564982e1
+
+test_nistkat.py:53: AssertionError
+----------------------------- Captured stdout call -----------------------------
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__8rNMzFfr/test > make TYPE=sign SCHEME=cross-rsdpg-192-fast IMPLEMENTATION=clean SCHEME_DIR=/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__8rNMzFfr/crypto_bla/scheme/impl DEST_DIR=/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__8rNMzFfr/bin KAT_RNG=nist nistkat
+cd /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__8rNMzFfr/crypto_bla/scheme/impl && make
+make[1]: Entering directory '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__8rNMzFfr/crypto_bla/scheme/impl'
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o CROSS.o CROSS.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o csprng_hash.o csprng_hash.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o merkle.o merkle.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o pack_unpack.o pack_unpack.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o seedtree.o seedtree.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o sign.o sign.c
+ar -r libcross-rsdpg-192-fast_clean.a CROSS.o csprng_hash.o merkle.o pack_unpack.o seedtree.o sign.o
+ar: creating libcross-rsdpg-192-fast_clean.a
+make[1]: Leaving directory '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__8rNMzFfr/crypto_bla/scheme/impl'
+mkdir -p /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__8rNMzFfr/bin
+cc -O3 -Wall -Wextra -Wpedantic -Wvla -Werror -std=c99 -Wundef -Wshadow -Wcast-align -Wpointer-arith -Wmissing-prototypes -fstrict-aliasing -fno-common -pipe -I../common  -DPQCLEAN_NAMESPACE=PQCLEAN_CROSSRSDPG192FAST_CLEAN -I/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__8rNMzFfr/crypto_bla/scheme/impl crypto_sign/nistkat.c ../common/aes.c ../common/sha2.c ../common/fips202.c ../common/nistseedexpander.c ../common/sp800-185.c ../test/common/nistkatrng.c -o /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__8rNMzFfr/bin/nistkat_cross-rsdpg-192-fast_clean -L/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__8rNMzFfr/crypto_bla/scheme/impl -lcross-rsdpg-192-fast_clean
+
+. > /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__8rNMzFfr/bin/nistkat_cross-rsdpg-192-fast_clean
+________ test_nistkat[clean implementation of cross-rsdp-192-balanced] _________
+
+implementation = <Implementation(cross-rsdp-192-balanced, clean)>
+impl_path = '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__Vz8Z1DlV/crypto_bla/scheme/impl'
+test_dir = '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__Vz8Z1DlV'
+init = <function isolate_test_files.<locals>.initializer at 0x7f3599245620>
+destr = <function isolate_test_files.<locals>.destructor at 0x7f35992456c0>
+
+    @pytest.mark.parametrize(
+        'implementation,test_dir,impl_path, init, destr',
+        [(impl, *helpers.isolate_test_files(impl.path(), 'test_functest_'))
+         for impl in pqclean.Scheme.all_supported_implementations()],
+        ids=[str(impl) for impl in pqclean.Scheme.all_supported_implementations()],
+    )
+    @helpers.filtered_test
+    def test_nistkat(implementation, impl_path, test_dir, init, destr):
+        if platform.machine() == 'armv7l' and 'gcc' in os.environ.get('CC', 'gcc') and 'falcon' in implementation.scheme.name:
+            raise unittest.SkipTest("this test hangs for falcon on armv7l with gcc")
+        init()
+        dest_path = os.path.join(test_dir, 'bin')
+        kat_rng = 'nist'
+        if 'nistkat-rng' in implementation.scheme.metadata():
+            kat_rng = implementation.scheme.metadata()['nistkat-rng']
+        helpers.make('nistkat',
+                     TYPE=implementation.scheme.type,
+                     SCHEME=implementation.scheme.name,
+                     IMPLEMENTATION=implementation.name,
+                     SCHEME_DIR=impl_path,
+                     DEST_DIR=dest_path,
+                     KAT_RNG=kat_rng,
+                     working_dir=os.path.join(test_dir, 'test'))
+        out = helpers.run_subprocess(
+            [os.path.join(dest_path, 'nistkat_{}_{}{}'.format(
+                implementation.scheme.name,
+                implementation.name,
+                '.exe' if os.name == 'nt' else ''
+            ))],
+            print_output=False,
+        ).replace('\r', '')
+>       assert(implementation.scheme.metadata()['nistkat-sha256'].lower()
+               == hashlib.sha256(out.encode('utf-8')).hexdigest().lower())
+E       AssertionError: assert '1078117cb91d...96027f237f509' == '8603e4dce0eb...514e957512bb4'
+E         
+E         - 8603e4dce0eb39a47dd19fcf00893ff3d3ec23c7b70ac54451b514e957512bb4
+E         + 1078117cb91d2dc316f0ddf3227d536bdfd9e2579acb0d6430b96027f237f509
+
+test_nistkat.py:53: AssertionError
+----------------------------- Captured stdout call -----------------------------
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__Vz8Z1DlV/test > make TYPE=sign SCHEME=cross-rsdp-192-balanced IMPLEMENTATION=clean SCHEME_DIR=/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__Vz8Z1DlV/crypto_bla/scheme/impl DEST_DIR=/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__Vz8Z1DlV/bin KAT_RNG=nist nistkat
+cd /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__Vz8Z1DlV/crypto_bla/scheme/impl && make
+make[1]: Entering directory '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__Vz8Z1DlV/crypto_bla/scheme/impl'
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o CROSS.o CROSS.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o csprng_hash.o csprng_hash.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o merkle.o merkle.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o pack_unpack.o pack_unpack.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o seedtree.o seedtree.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o sign.o sign.c
+ar -r libcross-rsdp-192-balanced_clean.a CROSS.o csprng_hash.o merkle.o pack_unpack.o seedtree.o sign.o
+ar: creating libcross-rsdp-192-balanced_clean.a
+make[1]: Leaving directory '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__Vz8Z1DlV/crypto_bla/scheme/impl'
+mkdir -p /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__Vz8Z1DlV/bin
+cc -O3 -Wall -Wextra -Wpedantic -Wvla -Werror -std=c99 -Wundef -Wshadow -Wcast-align -Wpointer-arith -Wmissing-prototypes -fstrict-aliasing -fno-common -pipe -I../common  -DPQCLEAN_NAMESPACE=PQCLEAN_CROSSRSDP192BALANCED_CLEAN -I/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__Vz8Z1DlV/crypto_bla/scheme/impl crypto_sign/nistkat.c ../common/aes.c ../common/sha2.c ../common/fips202.c ../common/nistseedexpander.c ../common/sp800-185.c ../test/common/nistkatrng.c -o /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__Vz8Z1DlV/bin/nistkat_cross-rsdp-192-balanced_clean -L/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__Vz8Z1DlV/crypto_bla/scheme/impl -lcross-rsdp-192-balanced_clean
+
+. > /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__Vz8Z1DlV/bin/nistkat_cross-rsdp-192-balanced_clean
+_________ test_nistkat[clean implementation of cross-rsdpg-128-small] __________
+
+implementation = <Implementation(cross-rsdpg-128-small, clean)>
+impl_path = '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__QCB_IPmL/crypto_bla/scheme/impl'
+test_dir = '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__QCB_IPmL'
+init = <function isolate_test_files.<locals>.initializer at 0x7f3599245760>
+destr = <function isolate_test_files.<locals>.destructor at 0x7f3599245800>
+
+    @pytest.mark.parametrize(
+        'implementation,test_dir,impl_path, init, destr',
+        [(impl, *helpers.isolate_test_files(impl.path(), 'test_functest_'))
+         for impl in pqclean.Scheme.all_supported_implementations()],
+        ids=[str(impl) for impl in pqclean.Scheme.all_supported_implementations()],
+    )
+    @helpers.filtered_test
+    def test_nistkat(implementation, impl_path, test_dir, init, destr):
+        if platform.machine() == 'armv7l' and 'gcc' in os.environ.get('CC', 'gcc') and 'falcon' in implementation.scheme.name:
+            raise unittest.SkipTest("this test hangs for falcon on armv7l with gcc")
+        init()
+        dest_path = os.path.join(test_dir, 'bin')
+        kat_rng = 'nist'
+        if 'nistkat-rng' in implementation.scheme.metadata():
+            kat_rng = implementation.scheme.metadata()['nistkat-rng']
+        helpers.make('nistkat',
+                     TYPE=implementation.scheme.type,
+                     SCHEME=implementation.scheme.name,
+                     IMPLEMENTATION=implementation.name,
+                     SCHEME_DIR=impl_path,
+                     DEST_DIR=dest_path,
+                     KAT_RNG=kat_rng,
+                     working_dir=os.path.join(test_dir, 'test'))
+        out = helpers.run_subprocess(
+            [os.path.join(dest_path, 'nistkat_{}_{}{}'.format(
+                implementation.scheme.name,
+                implementation.name,
+                '.exe' if os.name == 'nt' else ''
+            ))],
+            print_output=False,
+        ).replace('\r', '')
+>       assert(implementation.scheme.metadata()['nistkat-sha256'].lower()
+               == hashlib.sha256(out.encode('utf-8')).hexdigest().lower())
+E       AssertionError: assert '05fa093e5c72...784f4d230003a' == '183b604afcb4...a112412c80bbc'
+E         
+E         - 183b604afcb4d034f4b11dc92d86deee6b3b8d4f5af71adb3d0a112412c80bbc
+E         + 05fa093e5c72b876af595635e4c9cc83b3bdd9b5c83bef39441784f4d230003a
+
+test_nistkat.py:53: AssertionError
+----------------------------- Captured stdout call -----------------------------
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__QCB_IPmL/test > make TYPE=sign SCHEME=cross-rsdpg-128-small IMPLEMENTATION=clean SCHEME_DIR=/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__QCB_IPmL/crypto_bla/scheme/impl DEST_DIR=/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__QCB_IPmL/bin KAT_RNG=nist nistkat
+cd /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__QCB_IPmL/crypto_bla/scheme/impl && make
+make[1]: Entering directory '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__QCB_IPmL/crypto_bla/scheme/impl'
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o CROSS.o CROSS.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o csprng_hash.o csprng_hash.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o merkle.o merkle.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o pack_unpack.o pack_unpack.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o seedtree.o seedtree.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o sign.o sign.c
+ar -r libcross-rsdpg-128-small_clean.a CROSS.o csprng_hash.o merkle.o pack_unpack.o seedtree.o sign.o
+ar: creating libcross-rsdpg-128-small_clean.a
+make[1]: Leaving directory '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__QCB_IPmL/crypto_bla/scheme/impl'
+mkdir -p /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__QCB_IPmL/bin
+cc -O3 -Wall -Wextra -Wpedantic -Wvla -Werror -std=c99 -Wundef -Wshadow -Wcast-align -Wpointer-arith -Wmissing-prototypes -fstrict-aliasing -fno-common -pipe -I../common  -DPQCLEAN_NAMESPACE=PQCLEAN_CROSSRSDPG128SMALL_CLEAN -I/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__QCB_IPmL/crypto_bla/scheme/impl crypto_sign/nistkat.c ../common/aes.c ../common/sha2.c ../common/fips202.c ../common/nistseedexpander.c ../common/sp800-185.c ../test/common/nistkatrng.c -o /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__QCB_IPmL/bin/nistkat_cross-rsdpg-128-small_clean -L/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__QCB_IPmL/crypto_bla/scheme/impl -lcross-rsdpg-128-small_clean
+
+. > /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__QCB_IPmL/bin/nistkat_cross-rsdpg-128-small_clean
+__________ test_nistkat[clean implementation of cross-rsdpg-128-fast] __________
+
+implementation = <Implementation(cross-rsdpg-128-fast, clean)>
+impl_path = '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__q7oyNhOS/crypto_bla/scheme/impl'
+test_dir = '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__q7oyNhOS'
+init = <function isolate_test_files.<locals>.initializer at 0x7f35992458a0>
+destr = <function isolate_test_files.<locals>.destructor at 0x7f3599245940>
+
+    @pytest.mark.parametrize(
+        'implementation,test_dir,impl_path, init, destr',
+        [(impl, *helpers.isolate_test_files(impl.path(), 'test_functest_'))
+         for impl in pqclean.Scheme.all_supported_implementations()],
+        ids=[str(impl) for impl in pqclean.Scheme.all_supported_implementations()],
+    )
+    @helpers.filtered_test
+    def test_nistkat(implementation, impl_path, test_dir, init, destr):
+        if platform.machine() == 'armv7l' and 'gcc' in os.environ.get('CC', 'gcc') and 'falcon' in implementation.scheme.name:
+            raise unittest.SkipTest("this test hangs for falcon on armv7l with gcc")
+        init()
+        dest_path = os.path.join(test_dir, 'bin')
+        kat_rng = 'nist'
+        if 'nistkat-rng' in implementation.scheme.metadata():
+            kat_rng = implementation.scheme.metadata()['nistkat-rng']
+        helpers.make('nistkat',
+                     TYPE=implementation.scheme.type,
+                     SCHEME=implementation.scheme.name,
+                     IMPLEMENTATION=implementation.name,
+                     SCHEME_DIR=impl_path,
+                     DEST_DIR=dest_path,
+                     KAT_RNG=kat_rng,
+                     working_dir=os.path.join(test_dir, 'test'))
+        out = helpers.run_subprocess(
+            [os.path.join(dest_path, 'nistkat_{}_{}{}'.format(
+                implementation.scheme.name,
+                implementation.name,
+                '.exe' if os.name == 'nt' else ''
+            ))],
+            print_output=False,
+        ).replace('\r', '')
+>       assert(implementation.scheme.metadata()['nistkat-sha256'].lower()
+               == hashlib.sha256(out.encode('utf-8')).hexdigest().lower())
+E       AssertionError: assert '62bcbf5ec6f3...c7ae4efe27603' == 'eb6b0fecc3af...ae82d5838bdd9'
+E         
+E         - eb6b0fecc3af0dbc92653b766db3466714ba3bc75d461e7c3adae82d5838bdd9
+E         + 62bcbf5ec6f3b8238c919310337bedb4af0c6ecaf8c85d894d5c7ae4efe27603
+
+test_nistkat.py:53: AssertionError
+----------------------------- Captured stdout call -----------------------------
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__q7oyNhOS/test > make TYPE=sign SCHEME=cross-rsdpg-128-fast IMPLEMENTATION=clean SCHEME_DIR=/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__q7oyNhOS/crypto_bla/scheme/impl DEST_DIR=/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__q7oyNhOS/bin KAT_RNG=nist nistkat
+cd /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__q7oyNhOS/crypto_bla/scheme/impl && make
+make[1]: Entering directory '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__q7oyNhOS/crypto_bla/scheme/impl'
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o CROSS.o CROSS.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o csprng_hash.o csprng_hash.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o merkle.o merkle.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o pack_unpack.o pack_unpack.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o seedtree.o seedtree.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o sign.o sign.c
+ar -r libcross-rsdpg-128-fast_clean.a CROSS.o csprng_hash.o merkle.o pack_unpack.o seedtree.o sign.o
+ar: creating libcross-rsdpg-128-fast_clean.a
+make[1]: Leaving directory '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__q7oyNhOS/crypto_bla/scheme/impl'
+mkdir -p /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__q7oyNhOS/bin
+cc -O3 -Wall -Wextra -Wpedantic -Wvla -Werror -std=c99 -Wundef -Wshadow -Wcast-align -Wpointer-arith -Wmissing-prototypes -fstrict-aliasing -fno-common -pipe -I../common  -DPQCLEAN_NAMESPACE=PQCLEAN_CROSSRSDPG128FAST_CLEAN -I/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__q7oyNhOS/crypto_bla/scheme/impl crypto_sign/nistkat.c ../common/aes.c ../common/sha2.c ../common/fips202.c ../common/nistseedexpander.c ../common/sp800-185.c ../test/common/nistkatrng.c -o /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__q7oyNhOS/bin/nistkat_cross-rsdpg-128-fast_clean -L/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__q7oyNhOS/crypto_bla/scheme/impl -lcross-rsdpg-128-fast_clean
+
+. > /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__q7oyNhOS/bin/nistkat_cross-rsdpg-128-fast_clean
+__________ test_nistkat[clean implementation of cross-rsdp-256-small] __________
+
+implementation = <Implementation(cross-rsdp-256-small, clean)>
+impl_path = '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__N9QrFM_p/crypto_bla/scheme/impl'
+test_dir = '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__N9QrFM_p'
+init = <function isolate_test_files.<locals>.initializer at 0x7f35992459e0>
+destr = <function isolate_test_files.<locals>.destructor at 0x7f3599245a80>
+
+    @pytest.mark.parametrize(
+        'implementation,test_dir,impl_path, init, destr',
+        [(impl, *helpers.isolate_test_files(impl.path(), 'test_functest_'))
+         for impl in pqclean.Scheme.all_supported_implementations()],
+        ids=[str(impl) for impl in pqclean.Scheme.all_supported_implementations()],
+    )
+    @helpers.filtered_test
+    def test_nistkat(implementation, impl_path, test_dir, init, destr):
+        if platform.machine() == 'armv7l' and 'gcc' in os.environ.get('CC', 'gcc') and 'falcon' in implementation.scheme.name:
+            raise unittest.SkipTest("this test hangs for falcon on armv7l with gcc")
+        init()
+        dest_path = os.path.join(test_dir, 'bin')
+        kat_rng = 'nist'
+        if 'nistkat-rng' in implementation.scheme.metadata():
+            kat_rng = implementation.scheme.metadata()['nistkat-rng']
+        helpers.make('nistkat',
+                     TYPE=implementation.scheme.type,
+                     SCHEME=implementation.scheme.name,
+                     IMPLEMENTATION=implementation.name,
+                     SCHEME_DIR=impl_path,
+                     DEST_DIR=dest_path,
+                     KAT_RNG=kat_rng,
+                     working_dir=os.path.join(test_dir, 'test'))
+        out = helpers.run_subprocess(
+            [os.path.join(dest_path, 'nistkat_{}_{}{}'.format(
+                implementation.scheme.name,
+                implementation.name,
+                '.exe' if os.name == 'nt' else ''
+            ))],
+            print_output=False,
+        ).replace('\r', '')
+>       assert(implementation.scheme.metadata()['nistkat-sha256'].lower()
+               == hashlib.sha256(out.encode('utf-8')).hexdigest().lower())
+E       AssertionError: assert '445477598733...08d4f2c93e893' == '18e09ece296d...aafe3b67a8f59'
+E         
+E         - 18e09ece296d8a2f8c8c76ad80e80c2340c0dd607a4d9d87e9daafe3b67a8f59
+E         + 445477598733756c82d9f33d55e6724fdfcbbdcade402df20af08d4f2c93e893
+
+test_nistkat.py:53: AssertionError
+----------------------------- Captured stdout call -----------------------------
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__N9QrFM_p/test > make TYPE=sign SCHEME=cross-rsdp-256-small IMPLEMENTATION=clean SCHEME_DIR=/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__N9QrFM_p/crypto_bla/scheme/impl DEST_DIR=/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__N9QrFM_p/bin KAT_RNG=nist nistkat
+cd /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__N9QrFM_p/crypto_bla/scheme/impl && make
+make[1]: Entering directory '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__N9QrFM_p/crypto_bla/scheme/impl'
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o CROSS.o CROSS.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o csprng_hash.o csprng_hash.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o merkle.o merkle.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o pack_unpack.o pack_unpack.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o seedtree.o seedtree.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o sign.o sign.c
+ar -r libcross-rsdp-256-small_clean.a CROSS.o csprng_hash.o merkle.o pack_unpack.o seedtree.o sign.o
+ar: creating libcross-rsdp-256-small_clean.a
+make[1]: Leaving directory '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__N9QrFM_p/crypto_bla/scheme/impl'
+mkdir -p /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__N9QrFM_p/bin
+cc -O3 -Wall -Wextra -Wpedantic -Wvla -Werror -std=c99 -Wundef -Wshadow -Wcast-align -Wpointer-arith -Wmissing-prototypes -fstrict-aliasing -fno-common -pipe -I../common  -DPQCLEAN_NAMESPACE=PQCLEAN_CROSSRSDP256SMALL_CLEAN -I/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__N9QrFM_p/crypto_bla/scheme/impl crypto_sign/nistkat.c ../common/aes.c ../common/sha2.c ../common/fips202.c ../common/nistseedexpander.c ../common/sp800-185.c ../test/common/nistkatrng.c -o /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__N9QrFM_p/bin/nistkat_cross-rsdp-256-small_clean -L/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__N9QrFM_p/crypto_bla/scheme/impl -lcross-rsdp-256-small_clean
+
+. > /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__N9QrFM_p/bin/nistkat_cross-rsdp-256-small_clean
+________ test_nistkat[clean implementation of cross-rsdpg-192-balanced] ________
+
+implementation = <Implementation(cross-rsdpg-192-balanced, clean)>
+impl_path = '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__ANw9EsXY/crypto_bla/scheme/impl'
+test_dir = '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__ANw9EsXY'
+init = <function isolate_test_files.<locals>.initializer at 0x7f3599245b20>
+destr = <function isolate_test_files.<locals>.destructor at 0x7f3599245bc0>
+
+    @pytest.mark.parametrize(
+        'implementation,test_dir,impl_path, init, destr',
+        [(impl, *helpers.isolate_test_files(impl.path(), 'test_functest_'))
+         for impl in pqclean.Scheme.all_supported_implementations()],
+        ids=[str(impl) for impl in pqclean.Scheme.all_supported_implementations()],
+    )
+    @helpers.filtered_test
+    def test_nistkat(implementation, impl_path, test_dir, init, destr):
+        if platform.machine() == 'armv7l' and 'gcc' in os.environ.get('CC', 'gcc') and 'falcon' in implementation.scheme.name:
+            raise unittest.SkipTest("this test hangs for falcon on armv7l with gcc")
+        init()
+        dest_path = os.path.join(test_dir, 'bin')
+        kat_rng = 'nist'
+        if 'nistkat-rng' in implementation.scheme.metadata():
+            kat_rng = implementation.scheme.metadata()['nistkat-rng']
+        helpers.make('nistkat',
+                     TYPE=implementation.scheme.type,
+                     SCHEME=implementation.scheme.name,
+                     IMPLEMENTATION=implementation.name,
+                     SCHEME_DIR=impl_path,
+                     DEST_DIR=dest_path,
+                     KAT_RNG=kat_rng,
+                     working_dir=os.path.join(test_dir, 'test'))
+        out = helpers.run_subprocess(
+            [os.path.join(dest_path, 'nistkat_{}_{}{}'.format(
+                implementation.scheme.name,
+                implementation.name,
+                '.exe' if os.name == 'nt' else ''
+            ))],
+            print_output=False,
+        ).replace('\r', '')
+>       assert(implementation.scheme.metadata()['nistkat-sha256'].lower()
+               == hashlib.sha256(out.encode('utf-8')).hexdigest().lower())
+E       AssertionError: assert 'aec6a3462688...89a6fcf53678e' == 'e829f2c411e8...afef7e646c17e'
+E         
+E         - e829f2c411e8bfe5684d6c917bb1fe937c80467a8df8d5e4081afef7e646c17e
+E         + aec6a3462688b6889ba38b14c537d42cb765a1f075218be4c9489a6fcf53678e
+
+test_nistkat.py:53: AssertionError
+----------------------------- Captured stdout call -----------------------------
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__ANw9EsXY/test > make TYPE=sign SCHEME=cross-rsdpg-192-balanced IMPLEMENTATION=clean SCHEME_DIR=/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__ANw9EsXY/crypto_bla/scheme/impl DEST_DIR=/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__ANw9EsXY/bin KAT_RNG=nist nistkat
+cd /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__ANw9EsXY/crypto_bla/scheme/impl && make
+make[1]: Entering directory '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__ANw9EsXY/crypto_bla/scheme/impl'
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o CROSS.o CROSS.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o csprng_hash.o csprng_hash.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o merkle.o merkle.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o pack_unpack.o pack_unpack.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o seedtree.o seedtree.c
+cc -std=c99 -I../../../common  -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra -c -o sign.o sign.c
+ar -r libcross-rsdpg-192-balanced_clean.a CROSS.o csprng_hash.o merkle.o pack_unpack.o seedtree.o sign.o
+ar: creating libcross-rsdpg-192-balanced_clean.a
+make[1]: Leaving directory '/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__ANw9EsXY/crypto_bla/scheme/impl'
+mkdir -p /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__ANw9EsXY/bin
+cc -O3 -Wall -Wextra -Wpedantic -Wvla -Werror -std=c99 -Wundef -Wshadow -Wcast-align -Wpointer-arith -Wmissing-prototypes -fstrict-aliasing -fno-common -pipe -I../common  -DPQCLEAN_NAMESPACE=PQCLEAN_CROSSRSDPG192BALANCED_CLEAN -I/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__ANw9EsXY/crypto_bla/scheme/impl crypto_sign/nistkat.c ../common/aes.c ../common/sha2.c ../common/fips202.c ../common/nistseedexpander.c ../common/sp800-185.c ../test/common/nistkatrng.c -o /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__ANw9EsXY/bin/nistkat_cross-rsdpg-192-balanced_clean -L/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__ANw9EsXY/crypto_bla/scheme/impl -lcross-rsdpg-192-balanced_clean
+
+. > /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/testcases/test_functest__ANw9EsXY/bin/nistkat_cross-rsdpg-192-balanced_clean
+=========================== short test summary info ============================
+FAILED test_nistkat.py::test_nistkat[clean implementation of cross-rsdpg-256-balanced]
+FAILED test_nistkat.py::test_nistkat[clean implementation of cross-rsdp-192-fast]
+FAILED test_nistkat.py::test_nistkat[clean implementation of cross-rsdp-192-small]
+FAILED test_nistkat.py::test_nistkat[clean implementation of cross-rsdpg-192-small]
+FAILED test_nistkat.py::test_nistkat[clean implementation of cross-rsdp-128-small]
+FAILED test_nistkat.py::test_nistkat[clean implementation of cross-rsdp-256-balanced]
+FAILED test_nistkat.py::test_nistkat[clean implementation of cross-rsdpg-128-balanced]
+FAILED test_nistkat.py::test_nistkat[clean implementation of cross-rsdp-128-fast]
+FAILED test_nistkat.py::test_nistkat[clean implementation of cross-rsdpg-256-small]
+FAILED test_nistkat.py::test_nistkat[clean implementation of cross-rsdp-256-fast]
+FAILED test_nistkat.py::test_nistkat[clean implementation of cross-rsdpg-256-fast]
+FAILED test_nistkat.py::test_nistkat[clean implementation of cross-rsdpg-192-fast]
+FAILED test_nistkat.py::test_nistkat[clean implementation of cross-rsdp-192-balanced]
+FAILED test_nistkat.py::test_nistkat[clean implementation of cross-rsdpg-128-small]
+FAILED test_nistkat.py::test_nistkat[clean implementation of cross-rsdpg-128-fast]
+FAILED test_nistkat.py::test_nistkat[clean implementation of cross-rsdp-256-small]
+FAILED test_nistkat.py::test_nistkat[clean implementation of cross-rsdpg-192-balanced]
+=================== 17 failed, 1 passed in 97.68s (0:01:37) ====================

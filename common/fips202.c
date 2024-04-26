@@ -501,8 +501,12 @@ static void keccak_inc_squeeze(uint8_t *h, size_t outlen,
                                uint64_t *s_inc, uint32_t r) {
     size_t i;
 
-    printf("\n\n\n**** PRINT ****\n\n\n");fflush(stdin);
-    if(0 < s_inc[25]) {printf("\n\n\n**** IF ****\n\n\n");fflush(stdin);}
+/*     printf("\n\n\n**** PRINT ****\n\n\n");fflush(stdin);
+    printf("\n\n\n**** BEFORE FOR LOOP ****\n\n\n");fflush(stdin);
+    printf("\n\n\n**** OUTLEN %ld ****\n\n\n", outlen);fflush(stdin);
+    printf("\n\n\n**** R %d ****\n\n\n", r);fflush(stdin);
+    printf("\n\n\n**** s_inc[0] %ld ****\n\n\n", s_inc[0]);fflush(stdin);
+    printf("\n\n\n**** s_inc[25] %ld ****\n\n\n", s_inc[25]);fflush(stdin); */
 
     /* First consume any bytes we still have sitting around */
     for (i = 0; i < outlen && i < s_inc[25]; i++) {
@@ -510,6 +514,9 @@ static void keccak_inc_squeeze(uint8_t *h, size_t outlen,
            available byte. We consume from there, i.e., up to r. */
         h[i] = (uint8_t)(s_inc[(r - s_inc[25] + i) >> 3] >> (8 * ((r - s_inc[25] + i) & 0x07)));
     }
+
+    // printf("\n\n\n**** AFTER FOR LOOP ****\n\n\n");fflush(stdin);
+    
     h += i;
     outlen -= i;
     s_inc[25] -= i;
