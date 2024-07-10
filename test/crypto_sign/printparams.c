@@ -7,8 +7,8 @@
 
 int main(void) {
     printf("{\n");
-    printf("\t\"CRYPTO_SECRETKEYBYTES\": %u,\n",  NAMESPACE(CRYPTO_SECRETKEYBYTES));
-    printf("\t\"CRYPTO_PUBLICKEYBYTES\": %u,\n",  NAMESPACE(CRYPTO_PUBLICKEYBYTES));
-    printf("\t\"CRYPTO_BYTES\": %u,\n",           NAMESPACE(CRYPTO_BYTES));
+    printf("\t\"CRYPTO_SECRETKEYBYTES\": %lu,\n",  NAMESPACE(CRYPTO_SECRETKEYBYTES));
+    printf("\t\"CRYPTO_PUBLICKEYBYTES\": %lu,\n",  NAMESPACE(CRYPTO_PUBLICKEYBYTES));
+    printf("\t\"CRYPTO_BYTES\": %lu,\n",           NAMESPACE(CRYPTO_BYTES));
     printf("\t\"CRYPTO_ALGNAME\": \"%s\"\n}\n",   NAMESPACE(CRYPTO_ALGNAME));
 }

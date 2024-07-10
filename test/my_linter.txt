@@ -1,0 +1,707 @@
+============================= test session starts ==============================
+platform linux -- Python 3.11.2, pytest-8.1.1, pluggy-1.4.0
+rootdir: /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test
+configfile: pytest.ini
+plugins: xdist-3.5.0
+created: 4/4 workers
+4 workers [2 items]
+
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_______ test_clang_tidy[clean implementation of cross-rsdp-128-balanced] _______
+[gw0] linux -- Python 3.11.2 /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/.venv/bin/python
+
+implementation = <Implementation(cross-rsdp-128-balanced, clean)>
+
+    @pytest.mark.parametrize(
+        'implementation',
+        pqclean.Scheme.all_supported_implementations(),
+        ids=str,
+    )
+    @helpers.skip_windows()
+    @helpers.filtered_test
+    def test_clang_tidy(implementation: pqclean.Implementation):
+        helpers.ensure_available('clang-tidy')
+        cfiles = implementation.cfiles()
+        common_files = glob(os.path.join('..', 'common', '*.c'))
+        (returncode, _) = helpers.run_subprocess(
+            ['clang-tidy',
+             '-quiet',
+             '-header-filter=.*',
+             *additional_flags,
+             *cfiles,
+             *common_files,
+             '--',
+             '-iquote', os.path.join('..', 'common'),
+             '-iquote', implementation.path()],
+            expected_returncode=None,
+        )
+    
+        # Detect and gracefully avoid segfaults
+        if returncode == -11:
+            raise unittest.SkipTest("clang-tidy segfaulted")
+    
+>       assert returncode == 0, "Clang-tidy returned %d" % returncode
+E       AssertionError: Clang-tidy returned 1
+E       assert 1 == 0
+
+test_linter.py:42: AssertionError
+----------------------------- Captured stdout call -----------------------------
+. > clang-tidy -quiet -header-filter=.* ../crypto_sign/cross-rsdp-128-balanced/clean/merkle.c ../crypto_sign/cross-rsdp-128-balanced/clean/pack_unpack.c ../crypto_sign/cross-rsdp-128-balanced/clean/csprng_hash.c ../crypto_sign/cross-rsdp-128-balanced/clean/seedtree.c ../crypto_sign/cross-rsdp-128-balanced/clean/sign.c ../crypto_sign/cross-rsdp-128-balanced/clean/CROSS.c ../common/aes.c ../common/sp800-185.c ../common/nistseedexpander.c ../common/fips202.c ../common/randombytes.c ../common/sha2.c -- -iquote ../common -iquote ../crypto_sign/cross-rsdp-128-balanced/clean
+48 warnings generated.
+70 warnings generated.
+112 warnings generated.
+169 warnings generated.
+197 warnings generated.
+274 warnings generated.
+283 warnings generated.
+287 warnings generated.
+296 warnings generated.
+306 warnings generated.
+338 warnings generated.
+347 warnings generated.
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/CROSS.h:27:1: error: #includes are not sorted properly [llvm-include-order,-warnings-as-errors]
+#include "parameters.h"
+^        ~~~~~~~~~~~~~~
+         "pack_unpack.h"
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/CROSS.h:67:52: error: parameter 'SK' is const-qualified in the function declaration; const-qualification of parameters only has an effect in function definitions [readability-avoid-const-params-in-decls,-warnings-as-errors]
+void PQCLEAN_CROSSRSDP128BALANCED_CLEAN_CROSS_sign(const prikey_t * const SK,
+                                                   ^                ~~~~~~
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/CROSS.h:68:17: error: parameter 'm' is const-qualified in the function declaration; const-qualification of parameters only has an effect in function definitions [readability-avoid-const-params-in-decls,-warnings-as-errors]
+                const char * const m,
+                ^            ~~~~~~
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/CROSS.h:69:17: error: parameter 'mlen' is const-qualified in the function declaration; const-qualification of parameters only has an effect in function definitions [readability-avoid-const-params-in-decls,-warnings-as-errors]
+                const uint64_t mlen,
+                ^~~~~~
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/CROSS.h:70:17: error: parameter 'sig' is const-qualified in the function declaration; const-qualification of parameters only has an effect in function definitions [readability-avoid-const-params-in-decls,-warnings-as-errors]
+                sig_t * const sig);
+                ^       ~~~~~~
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/CROSS.h:73:53: error: parameter 'PK' is const-qualified in the function declaration; const-qualification of parameters only has an effect in function definitions [readability-avoid-const-params-in-decls,-warnings-as-errors]
+int PQCLEAN_CROSSRSDP128BALANCED_CLEAN_CROSS_verify(const pubkey_t * const PK,
+                                                    ^                ~~~~~~
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/CROSS.h:74:18: error: parameter 'm' is const-qualified in the function declaration; const-qualification of parameters only has an effect in function definitions [readability-avoid-const-params-in-decls,-warnings-as-errors]
+                 const char * const m,
+                 ^            ~~~~~~
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/CROSS.h:75:18: error: parameter 'mlen' is const-qualified in the function declaration; const-qualification of parameters only has an effect in function definitions [readability-avoid-const-params-in-decls,-warnings-as-errors]
+                 const uint64_t mlen,
+                 ^~~~~~
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/CROSS.h:76:18: error: parameter 'sig' is const-qualified in the function declaration; const-qualification of parameters only has an effect in function definitions [readability-avoid-const-params-in-decls,-warnings-as-errors]
+                 const sig_t * const sig);
+                 ^             ~~~~~~
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/csprng_hash.h:120:22: error: statement should be inside braces [google-readability-braces-around-statements,readability-braces-around-statements,-warnings-as-errors]
+   if(par_level == 1) initialize_csprng(&(states->state1), seed1, seed_len_bytes);
+                     ^
+                      {
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/csprng_hash.h:121:27: error: statement should be inside braces [google-readability-braces-around-statements,readability-braces-around-statements,-warnings-as-errors]
+   else if(par_level == 2) initialize_csprng_x2(&(states->state2), seed1, seed2, seed_len_bytes);
+                          ^
+                           {
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/csprng_hash.h:122:27: error: statement should be inside braces [google-readability-braces-around-statements,readability-braces-around-statements,-warnings-as-errors]
+   else if(par_level == 3) initialize_csprng_x3(&(states->state4), seed1, seed2, seed3, seed_len_bytes);
+                          ^
+                           {
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/csprng_hash.h:123:27: error: statement should be inside braces [google-readability-braces-around-statements,readability-braces-around-statements,-warnings-as-errors]
+   else if(par_level == 4) initialize_csprng_x4(&(states->state4), seed1, seed2, seed3, seed4, seed_len_bytes);
+                          ^
+                           {
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/csprng_hash.h:127:22: error: statement should be inside braces [google-readability-braces-around-statements,readability-braces-around-statements,-warnings-as-errors]
+   if(par_level == 1) csprng_randombytes(x1, xlen, &(states->state1));
+                     ^
+                      {
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/csprng_hash.h:128:27: error: statement should be inside braces [google-readability-braces-around-statements,readability-braces-around-statements,-warnings-as-errors]
+   else if(par_level == 2) csprng_randombytes_x2(x1, x2, xlen, &(states->state2));
+                          ^
+                           {
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/csprng_hash.h:129:27: error: statement should be inside braces [google-readability-braces-around-statements,readability-braces-around-statements,-warnings-as-errors]
+   else if(par_level == 3) csprng_randombytes_x3(x1, x2, x3, xlen, &(states->state4));
+                          ^
+                           {
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/csprng_hash.h:130:27: error: statement should be inside braces [google-readability-braces-around-statements,readability-braces-around-statements,-warnings-as-errors]
+   else if(par_level == 4) csprng_randombytes_x4(x1, x2, x3, x4, xlen, &(states->state4));
+                          ^
+                           {
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/csprng_hash.h:134:22: error: statement should be inside braces [google-readability-braces-around-statements,readability-braces-around-statements,-warnings-as-errors]
+   if(par_level == 1) csprng_release(&(states->state1));
+                     ^
+                      {
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/csprng_hash.h:135:27: error: statement should be inside braces [google-readability-braces-around-statements,readability-braces-around-statements,-warnings-as-errors]
+   else if(par_level == 2) csprng_release_x2(&(states->state2));
+                          ^
+                           {
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/csprng_hash.h:136:27: error: statement should be inside braces [google-readability-braces-around-statements,readability-braces-around-statements,-warnings-as-errors]
+   else if(par_level == 3) csprng_release_x3(&(states->state4));
+                          ^
+                           {
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/csprng_hash.h:137:27: error: statement should be inside braces [google-readability-braces-around-statements,readability-braces-around-statements,-warnings-as-errors]
+   else if(par_level == 4) csprng_release_x4(&(states->state4));
+                          ^
+                           {
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/fq_arith.h:28:1: error: #includes are not sorted properly [llvm-include-order,-warnings-as-errors]
+#include <stdlib.h>
+^        ~~~~~~~~~~
+         "csprng_hash.h"
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/fq_arith.h:39:34: error: macro argument should be enclosed in parentheses [bugprone-macro-parentheses,-warnings-as-errors]
+#define FQ_DOUBLE_ZERO_NORM(x) ((x + ((x + 1) >> 7)) & 0x7F)
+                                 ^
+                                 ()
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/fq_arith.h:39:40: error: macro argument should be enclosed in parentheses [bugprone-macro-parentheses,-warnings-as-errors]
+#define FQ_DOUBLE_ZERO_NORM(x) ((x + ((x + 1) >> 7)) & 0x7F)
+                                       ^
+                                       ()
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/fq_arith.h:40:68: error: macro argument should be enclosed in parentheses [bugprone-macro-parentheses,-warnings-as-errors]
+#define RESTR_TO_VAL(x) ( (FQ_ELEM) (RESTR_G_TABLE >> (8*(uint64_t)x)) )
+                                                                   ^
+                                                                   ()
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/fq_arith.h:65:37: error: pointer parameter 'e' can be pointer to const [readability-non-const-parameter,-warnings-as-errors]
+                            FZ_ELEM e[N],
+                                    ^
+                            const 
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/merkle.h:25:1: error: #includes are not sorted properly [llvm-include-order,-warnings-as-errors]
+#include "parameters.h"
+^        ~~~~~~~~~~~~~~
+         "csprng_hash.h"
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/merkle.h:38:6: error: function 'PQCLEAN_CROSSRSDP128BALANCED_CLEAN_rebuild_merkle_tree' has a definition with different parameter names [readability-inconsistent-declaration-parameter-name,-warnings-as-errors]
+void PQCLEAN_CROSSRSDP128BALANCED_CLEAN_rebuild_merkle_tree(unsigned char merkle_tree[NUM_NODES_MERKLE_TREE * HASH_DIGEST_LENGTH],
+     ^
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/merkle.c:275:6: note: the definition seen here
+void PQCLEAN_CROSSRSDP128BALANCED_CLEAN_rebuild_merkle_tree(unsigned char merkle_tree[NUM_NODES_MERKLE_TREE * HASH_DIGEST_LENGTH],
+     ^
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/merkle.h:38:6: note: differing parameters are named here: ('leaves'), in definition: ('commitments')
+void PQCLEAN_CROSSRSDP128BALANCED_CLEAN_rebuild_merkle_tree(unsigned char merkle_tree[NUM_NODES_MERKLE_TREE * HASH_DIGEST_LENGTH],
+     ^
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/pack_unpack.h:29:1: error: #includes are not sorted properly [llvm-include-order,-warnings-as-errors]
+#include <stdint.h>
+^        ~~~~~~~~~~
+         "parameters.h"
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/parameters.h:70:41: error: macro argument should be enclosed in parentheses [bugprone-macro-parentheses,-warnings-as-errors]
+#define ROUND_UP(amount, round_amt) ( ((amount+round_amt-1)/round_amt)*round_amt )
+                                        ^
+                                        (     )
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/parameters.h:70:48: error: macro argument should be enclosed in parentheses [bugprone-macro-parentheses,-warnings-as-errors]
+#define ROUND_UP(amount, round_amt) ( ((amount+round_amt-1)/round_amt)*round_amt )
+                                               ^
+                                               (        )
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/parameters.h:70:61: error: macro argument should be enclosed in parentheses [bugprone-macro-parentheses,-warnings-as-errors]
+#define ROUND_UP(amount, round_amt) ( ((amount+round_amt-1)/round_amt)*round_amt )
+                                                            ^
+                                                            (        )
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/parameters.h:70:72: error: macro argument should be enclosed in parentheses [bugprone-macro-parentheses,-warnings-as-errors]
+#define ROUND_UP(amount, round_amt) ( ((amount+round_amt-1)/round_amt)*round_amt )
+                                                                       ^
+                                                                       (        )
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/parameters.h:73:14: error: macro argument should be enclosed in parentheses [bugprone-macro-parentheses,-warnings-as-errors]
+(((uint32_t) N>=(1UL << (D-1)) && (uint32_t) N<(1UL << D)) ? D : -1)
+             ^
+             ()
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/parameters.h:73:26: error: macro argument should be enclosed in parentheses [bugprone-macro-parentheses,-warnings-as-errors]
+(((uint32_t) N>=(1UL << (D-1)) && (uint32_t) N<(1UL << D)) ? D : -1)
+                         ^
+                         ()
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/parameters.h:73:46: error: macro argument should be enclosed in parentheses [bugprone-macro-parentheses,-warnings-as-errors]
+(((uint32_t) N>=(1UL << (D-1)) && (uint32_t) N<(1UL << D)) ? D : -1)
+                                             ^
+                                             ()
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/parameters.h:73:56: error: macro argument should be enclosed in parentheses [bugprone-macro-parentheses,-warnings-as-errors]
+(((uint32_t) N>=(1UL << (D-1)) && (uint32_t) N<(1UL << D)) ? D : -1)
+                                                       ^
+                                                       ()
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/parameters.h:73:62: error: macro argument should be enclosed in parentheses [bugprone-macro-parentheses,-warnings-as-errors]
+(((uint32_t) N>=(1UL << (D-1)) && (uint32_t) N<(1UL << D)) ? D : -1)
+                                                             ^
+                                                             ()
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/parameters.h:76:4: error: macro argument should be enclosed in parentheses [bugprone-macro-parentheses,-warnings-as-errors]
+  (N == 0 ? 1 : (15                                     \
+   ^
+   ()
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/parameters.h:96:61: error: macro argument should be enclosed in parentheses [bugprone-macro-parentheses,-warnings-as-errors]
+#define LOG2(L) ( (BITS_TO_REPRESENT(L) > BITS_TO_REPRESENT(L-1)) ? (BITS_TO_REPRESENT(L-1)) : (BITS_TO_REPRESENT(L)) )
+                                                            ^
+                                                            ()
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/parameters.h:96:88: error: macro argument should be enclosed in parentheses [bugprone-macro-parentheses,-warnings-as-errors]
+#define LOG2(L) ( (BITS_TO_REPRESENT(L) > BITS_TO_REPRESENT(L-1)) ? (BITS_TO_REPRESENT(L-1)) : (BITS_TO_REPRESENT(L)) )
+                                                                                       ^
+                                                                                       ()
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/restr_arith.h:32:34: error: macro argument should be enclosed in parentheses [bugprone-macro-parentheses,-warnings-as-errors]
+#define FZ_DOUBLE_ZERO_NORM(x) ((x + ((x + 1) >> 3)) & 0x07)
+                                 ^
+                                 ()
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/restr_arith.h:32:40: error: macro argument should be enclosed in parentheses [bugprone-macro-parentheses,-warnings-as-errors]
+#define FZ_DOUBLE_ZERO_NORM(x) ((x + ((x + 1) >> 3)) & 0x07)
+                                       ^
+                                       ()
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/seedtree.h:28:1: error: #includes are not sorted properly [llvm-include-order,-warnings-as-errors]
+#include "parameters.h"
+^        ~~~~~~~~~~~~~~
+         "csprng_hash.h"
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/sha3.h:38:18: error: Value stored to 'val' is never read [clang-analyzer-deadcode.DeadStores,-warnings-as-errors]
+   if(val == 0) {val = 0;};
+                 ^     ~
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/sha3.h:38:18: note: Value stored to 'val' is never read
+   if(val == 0) {val = 0;};
+                 ^     ~
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/CROSS.c:25:1: error: #includes are not sorted properly [llvm-include-order,-warnings-as-errors]
+#include <assert.h>
+^        ~~~~~~~~~~
+         "CROSS.h"
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/csprng_hash.c:26:1: error: #includes are not sorted properly [llvm-include-order,-warnings-as-errors]
+#include <string.h>
+^        ~~~~~~~~~~
+         "csprng_hash.h"
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/merkle.c:34:32: error: macro argument should be enclosed in parentheses [bugprone-macro-parentheses,-warnings-as-errors]
+#define SIBLING(i) ( ((i)%2) ? i+1 : i-1 )
+                               ^
+                               ()
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/merkle.c:34:38: error: macro argument should be enclosed in parentheses [bugprone-macro-parentheses,-warnings-as-errors]
+#define SIBLING(i) ( ((i)%2) ? i+1 : i-1 )
+                                     ^
+                                     ()
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/merkle.c:36:16: error: macro argument should be enclosed in parentheses [bugprone-macro-parentheses,-warnings-as-errors]
+#define RL(i) (i==1 ? r_node : l_node)
+               ^
+               ()
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/merkle.c:253:85: error: statement should be inside braces [google-readability-braces-around-statements,readability-braces-around-statements,-warnings-as-errors]
+        if ( (flag_tree[i] == NOT_COMPUTED) && (flag_tree[SIBLING(i)] == COMPUTED) )
+                                                                                    ^
+                                                                                     {
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/pack_unpack.c:26:1: error: #includes are not sorted properly [llvm-include-order,-warnings-as-errors]
+#include <stdint.h>
+^        ~~~~~~~~~~
+         <stddef.h>
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/pack_unpack.c:322:18: error: statement should be inside braces [readability-braces-around-statements,-warnings-as-errors]
+   if(inlen == 0) inlen = 0;
+                 ^
+                  {
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/pack_unpack.c:322:19: error: Value stored to 'inlen' is never read [clang-analyzer-deadcode.DeadStores,-warnings-as-errors]
+   if(inlen == 0) inlen = 0;
+                  ^       ~
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/pack_unpack.c:322:19: note: Value stored to 'inlen' is never read
+   if(inlen == 0) inlen = 0;
+                  ^       ~
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/pack_unpack.c:557:7: error: Value stored to 'skip' is never read [clang-analyzer-deadcode.DeadStores,-warnings-as-errors]
+      skip = 0;
+      ^      ~
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/pack_unpack.c:557:7: note: Value stored to 'skip' is never read
+      skip = 0;
+      ^      ~
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/pack_unpack.c:675:7: error: Value stored to 'skip' is never read [clang-analyzer-deadcode.DeadStores,-warnings-as-errors]
+      skip = 0;
+      ^      ~
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/pack_unpack.c:675:7: note: Value stored to 'skip' is never read
+      skip = 0;
+      ^      ~
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/seedtree.c:30:26: error: macro argument should be enclosed in parentheses [bugprone-macro-parentheses,-warnings-as-errors]
+#define LEFT_CHILD(i) (2*i+1)
+                         ^
+                         ()
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/seedtree.c:31:27: error: macro argument should be enclosed in parentheses [bugprone-macro-parentheses,-warnings-as-errors]
+#define RIGHT_CHILD(i) (2*i+2)
+                          ^
+                          ()
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/seedtree.c:32:21: error: macro argument should be enclosed in parentheses [bugprone-macro-parentheses,-warnings-as-errors]
+#define PARENT(i) ((i-1)/2)
+                    ^
+                    ()
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/seedtree.c:37:30: error: macro argument should be enclosed in parentheses [bugprone-macro-parentheses,-warnings-as-errors]
+#define DIV_BY_TWO_CEIL(i)  (i/2 + i % 2)
+                             ^
+                             ()
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/seedtree.c:37:36: error: macro argument should be enclosed in parentheses [bugprone-macro-parentheses,-warnings-as-errors]
+#define DIV_BY_TWO_CEIL(i)  (i/2 + i % 2)
+                                   ^
+                                   ()
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/seedtree.c:43:6: error: the value returned by this function should be used [cert-err33-c,-warnings-as-errors]
+     fprintf(stderr,"-");
+     ^~~~~~~~~~~~~~~~~~~
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/seedtree.c:43:6: note: cast the expression to void to silence this warning
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/seedtree.c:45:6: error: the value returned by this function should be used [cert-err33-c,-warnings-as-errors]
+     fprintf(stderr,"%02X", seed[i]);
+     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/seedtree.c:45:6: note: cast the expression to void to silence this warning
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/seedtree.c:47:6: error: the value returned by this function should be used [cert-err33-c,-warnings-as-errors]
+     fprintf(stderr,"- ");
+     ^~~~~~~~~~~~~~~~~~~~
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/seedtree.c:47:6: note: cast the expression to void to silence this warning
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/seedtree.c:52:4: error: the value returned by this function should be used [cert-err33-c,-warnings-as-errors]
+   fprintf(stderr,"Tree dump\n");
+   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/seedtree.c:52:4: note: cast the expression to void to silence this warning
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/seedtree.c:55:7: error: the value returned by this function should be used [cert-err33-c,-warnings-as-errors]
+      fprintf(stderr,"level %d ", level);
+      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/seedtree.c:55:7: note: cast the expression to void to silence this warning
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/seedtree.c:59:11: error: the value returned by this function should be used [cert-err33-c,-warnings-as-errors]
+          fprintf(stderr," [%d] ",node_idx);
+          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/seedtree.c:59:11: note: cast the expression to void to silence this warning
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/seedtree.c:63:7: error: the value returned by this function should be used [cert-err33-c,-warnings-as-errors]
+      fprintf(stderr,"\n");
+      ^~~~~~~~~~~~~~~~~~~~
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/seedtree.c:63:7: note: cast the expression to void to silence this warning
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/seedtree.c:65:4: error: the value returned by this function should be used [cert-err33-c,-warnings-as-errors]
+   fprintf(stderr,"\n");
+   ^~~~~~~~~~~~~~~~~~~~
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/seedtree.c:65:4: note: cast the expression to void to silence this warning
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/sign.c:118:19: error: statement should be inside braces [readability-braces-around-statements,-warnings-as-errors]
+   if(siglen == 0) siglen = 0;
+                  ^
+                   {
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/sign.c:118:20: error: Value stored to 'siglen' is never read [clang-analyzer-deadcode.DeadStores,-warnings-as-errors]
+   if(siglen == 0) siglen = 0;
+                   ^        ~
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/clean/sign.c:118:20: note: Value stored to 'siglen' is never read
+   if(siglen == 0) siglen = 0;
+                   ^        ~
+
+_______ test_clang_tidy[avx2 implementation of cross-rsdp-128-balanced] ________
+[gw1] linux -- Python 3.11.2 /home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/.venv/bin/python
+
+implementation = <Implementation(cross-rsdp-128-balanced, avx2)>
+
+    @pytest.mark.parametrize(
+        'implementation',
+        pqclean.Scheme.all_supported_implementations(),
+        ids=str,
+    )
+    @helpers.skip_windows()
+    @helpers.filtered_test
+    def test_clang_tidy(implementation: pqclean.Implementation):
+        helpers.ensure_available('clang-tidy')
+        cfiles = implementation.cfiles()
+        common_files = glob(os.path.join('..', 'common', '*.c'))
+        (returncode, _) = helpers.run_subprocess(
+            ['clang-tidy',
+             '-quiet',
+             '-header-filter=.*',
+             *additional_flags,
+             *cfiles,
+             *common_files,
+             '--',
+             '-iquote', os.path.join('..', 'common'),
+             '-iquote', implementation.path()],
+            expected_returncode=None,
+        )
+    
+        # Detect and gracefully avoid segfaults
+        if returncode == -11:
+            raise unittest.SkipTest("clang-tidy segfaulted")
+    
+>       assert returncode == 0, "Clang-tidy returned %d" % returncode
+E       AssertionError: Clang-tidy returned 1
+E       assert 1 == 0
+
+test_linter.py:42: AssertionError
+----------------------------- Captured stdout call -----------------------------
+. > clang-tidy -quiet -header-filter=.* ../crypto_sign/cross-rsdp-128-balanced/avx2/merkle.c ../crypto_sign/cross-rsdp-128-balanced/avx2/pack_unpack.c ../crypto_sign/cross-rsdp-128-balanced/avx2/csprng_hash.c ../crypto_sign/cross-rsdp-128-balanced/avx2/seedtree.c ../crypto_sign/cross-rsdp-128-balanced/avx2/sign.c ../crypto_sign/cross-rsdp-128-balanced/avx2/CROSS.c ../common/aes.c ../common/sp800-185.c ../common/nistseedexpander.c ../common/fips202.c ../common/randombytes.c ../common/sha2.c -- -iquote ../common -iquote ../crypto_sign/cross-rsdp-128-balanced/avx2
+48 warnings generated.
+70 warnings generated.
+112 warnings generated.
+169 warnings generated.
+197 warnings generated.
+302 warnings generated.
+311 warnings generated.
+315 warnings generated.
+324 warnings generated.
+334 warnings generated.
+366 warnings generated.
+375 warnings generated.
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/CROSS.h:27:1: error: #includes are not sorted properly [llvm-include-order,-warnings-as-errors]
+#include "parameters.h"
+^        ~~~~~~~~~~~~~~
+         "pack_unpack.h"
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/CROSS.h:67:51: error: parameter 'SK' is const-qualified in the function declaration; const-qualification of parameters only has an effect in function definitions [readability-avoid-const-params-in-decls,-warnings-as-errors]
+void PQCLEAN_CROSSRSDP128BALANCED_AVX2_CROSS_sign(const prikey_t * const SK,
+                                                  ^                ~~~~~~
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/CROSS.h:68:17: error: parameter 'm' is const-qualified in the function declaration; const-qualification of parameters only has an effect in function definitions [readability-avoid-const-params-in-decls,-warnings-as-errors]
+                const char * const m,
+                ^            ~~~~~~
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/CROSS.h:69:17: error: parameter 'mlen' is const-qualified in the function declaration; const-qualification of parameters only has an effect in function definitions [readability-avoid-const-params-in-decls,-warnings-as-errors]
+                const uint64_t mlen,
+                ^~~~~~
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/CROSS.h:70:17: error: parameter 'sig' is const-qualified in the function declaration; const-qualification of parameters only has an effect in function definitions [readability-avoid-const-params-in-decls,-warnings-as-errors]
+                sig_t * const sig);
+                ^       ~~~~~~
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/CROSS.h:73:52: error: parameter 'PK' is const-qualified in the function declaration; const-qualification of parameters only has an effect in function definitions [readability-avoid-const-params-in-decls,-warnings-as-errors]
+int PQCLEAN_CROSSRSDP128BALANCED_AVX2_CROSS_verify(const pubkey_t * const PK,
+                                                   ^                ~~~~~~
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/CROSS.h:74:18: error: parameter 'm' is const-qualified in the function declaration; const-qualification of parameters only has an effect in function definitions [readability-avoid-const-params-in-decls,-warnings-as-errors]
+                 const char * const m,
+                 ^            ~~~~~~
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/CROSS.h:75:18: error: parameter 'mlen' is const-qualified in the function declaration; const-qualification of parameters only has an effect in function definitions [readability-avoid-const-params-in-decls,-warnings-as-errors]
+                 const uint64_t mlen,
+                 ^~~~~~
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/CROSS.h:76:18: error: parameter 'sig' is const-qualified in the function declaration; const-qualification of parameters only has an effect in function definitions [readability-avoid-const-params-in-decls,-warnings-as-errors]
+                 const sig_t * const sig);
+                 ^             ~~~~~~
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/architecture_detect.h:7:1: error: #includes are not sorted properly [llvm-include-order,-warnings-as-errors]
+#include <x86intrin.h>
+^        ~~~~~~~~~~~~~
+         <immintrin.h>
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/csprng_hash.h:120:22: error: statement should be inside braces [google-readability-braces-around-statements,readability-braces-around-statements,-warnings-as-errors]
+   if(par_level == 1) initialize_csprng(&(states->state1), seed1, seed_len_bytes);
+                     ^
+                      {
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/csprng_hash.h:121:27: error: statement should be inside braces [google-readability-braces-around-statements,readability-braces-around-statements,-warnings-as-errors]
+   else if(par_level == 2) initialize_csprng_x2(&(states->state2), seed1, seed2, seed_len_bytes);
+                          ^
+                           {
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/csprng_hash.h:122:27: error: statement should be inside braces [google-readability-braces-around-statements,readability-braces-around-statements,-warnings-as-errors]
+   else if(par_level == 3) initialize_csprng_x3(&(states->state4), seed1, seed2, seed3, seed_len_bytes);
+                          ^
+                           {
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/csprng_hash.h:123:27: error: statement should be inside braces [google-readability-braces-around-statements,readability-braces-around-statements,-warnings-as-errors]
+   else if(par_level == 4) initialize_csprng_x4(&(states->state4), seed1, seed2, seed3, seed4, seed_len_bytes);
+                          ^
+                           {
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/csprng_hash.h:127:22: error: statement should be inside braces [google-readability-braces-around-statements,readability-braces-around-statements,-warnings-as-errors]
+   if(par_level == 1) csprng_randombytes(x1, xlen, &(states->state1));
+                     ^
+                      {
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/csprng_hash.h:128:27: error: statement should be inside braces [google-readability-braces-around-statements,readability-braces-around-statements,-warnings-as-errors]
+   else if(par_level == 2) csprng_randombytes_x2(x1, x2, xlen, &(states->state2));
+                          ^
+                           {
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/csprng_hash.h:129:27: error: statement should be inside braces [google-readability-braces-around-statements,readability-braces-around-statements,-warnings-as-errors]
+   else if(par_level == 3) csprng_randombytes_x3(x1, x2, x3, xlen, &(states->state4));
+                          ^
+                           {
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/csprng_hash.h:130:27: error: statement should be inside braces [google-readability-braces-around-statements,readability-braces-around-statements,-warnings-as-errors]
+   else if(par_level == 4) csprng_randombytes_x4(x1, x2, x3, x4, xlen, &(states->state4));
+                          ^
+                           {
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/csprng_hash.h:134:22: error: statement should be inside braces [google-readability-braces-around-statements,readability-braces-around-statements,-warnings-as-errors]
+   if(par_level == 1) csprng_release(&(states->state1));
+                     ^
+                      {
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/csprng_hash.h:135:27: error: statement should be inside braces [google-readability-braces-around-statements,readability-braces-around-statements,-warnings-as-errors]
+   else if(par_level == 2) csprng_release_x2(&(states->state2));
+                          ^
+                           {
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/csprng_hash.h:136:27: error: statement should be inside braces [google-readability-braces-around-statements,readability-braces-around-statements,-warnings-as-errors]
+   else if(par_level == 3) csprng_release_x3(&(states->state4));
+                          ^
+                           {
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/csprng_hash.h:137:27: error: statement should be inside braces [google-readability-braces-around-statements,readability-braces-around-statements,-warnings-as-errors]
+   else if(par_level == 4) csprng_release_x4(&(states->state4));
+                          ^
+                           {
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/fq_arith.h:28:1: error: #includes are not sorted properly [llvm-include-order,-warnings-as-errors]
+#include <stdlib.h>
+^        ~~~~~~~~~~
+         "architecture_detect.h"
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/fq_arith.h:33:1: error: #includes are not sorted properly [llvm-include-order,-warnings-as-errors]
+#include "parameters.h"
+^        ~~~~~~~~~~~~~~
+         "csprng_hash.h"
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/fq_arith.h:42:34: error: macro argument should be enclosed in parentheses [bugprone-macro-parentheses,-warnings-as-errors]
+#define FQ_DOUBLE_ZERO_NORM(x) ((x + ((x + 1) >> 7)) & 0x7F)
+                                 ^
+                                 ()
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/fq_arith.h:42:40: error: macro argument should be enclosed in parentheses [bugprone-macro-parentheses,-warnings-as-errors]
+#define FQ_DOUBLE_ZERO_NORM(x) ((x + ((x + 1) >> 7)) & 0x7F)
+                                       ^
+                                       ()
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/fq_arith.h:43:68: error: macro argument should be enclosed in parentheses [bugprone-macro-parentheses,-warnings-as-errors]
+#define RESTR_TO_VAL(x) ( (FQ_ELEM) (RESTR_G_TABLE >> (8*(uint64_t)x)) )
+                                                                   ^
+                                                                   ()
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/fq_arith.h:69:37: error: pointer parameter 'e' can be pointer to const [readability-non-const-parameter,-warnings-as-errors]
+                            FZ_ELEM e[N],
+                                    ^
+                            const 
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/merkle.h:25:1: error: #includes are not sorted properly [llvm-include-order,-warnings-as-errors]
+#include "parameters.h"
+^        ~~~~~~~~~~~~~~
+         "csprng_hash.h"
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/merkle.h:38:6: error: function 'PQCLEAN_CROSSRSDP128BALANCED_AVX2_rebuild_merkle_tree' has a definition with different parameter names [readability-inconsistent-declaration-parameter-name,-warnings-as-errors]
+void PQCLEAN_CROSSRSDP128BALANCED_AVX2_rebuild_merkle_tree(unsigned char merkle_tree[NUM_NODES_MERKLE_TREE * HASH_DIGEST_LENGTH],
+     ^
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/merkle.c:302:6: note: the definition seen here
+void PQCLEAN_CROSSRSDP128BALANCED_AVX2_rebuild_merkle_tree(unsigned char merkle_tree[NUM_NODES_MERKLE_TREE * HASH_DIGEST_LENGTH],
+     ^
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/merkle.h:38:6: note: differing parameters are named here: ('leaves'), in definition: ('commitments')
+void PQCLEAN_CROSSRSDP128BALANCED_AVX2_rebuild_merkle_tree(unsigned char merkle_tree[NUM_NODES_MERKLE_TREE * HASH_DIGEST_LENGTH],
+     ^
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/pack_unpack.h:29:1: error: #includes are not sorted properly [llvm-include-order,-warnings-as-errors]
+#include <stdint.h>
+^        ~~~~~~~~~~
+         "parameters.h"
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/parameters.h:70:41: error: macro argument should be enclosed in parentheses [bugprone-macro-parentheses,-warnings-as-errors]
+#define ROUND_UP(amount, round_amt) ( ((amount+round_amt-1)/round_amt)*round_amt )
+                                        ^
+                                        (     )
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/parameters.h:70:48: error: macro argument should be enclosed in parentheses [bugprone-macro-parentheses,-warnings-as-errors]
+#define ROUND_UP(amount, round_amt) ( ((amount+round_amt-1)/round_amt)*round_amt )
+                                               ^
+                                               (        )
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/parameters.h:70:61: error: macro argument should be enclosed in parentheses [bugprone-macro-parentheses,-warnings-as-errors]
+#define ROUND_UP(amount, round_amt) ( ((amount+round_amt-1)/round_amt)*round_amt )
+                                                            ^
+                                                            (        )
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/parameters.h:70:72: error: macro argument should be enclosed in parentheses [bugprone-macro-parentheses,-warnings-as-errors]
+#define ROUND_UP(amount, round_amt) ( ((amount+round_amt-1)/round_amt)*round_amt )
+                                                                       ^
+                                                                       (        )
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/parameters.h:73:14: error: macro argument should be enclosed in parentheses [bugprone-macro-parentheses,-warnings-as-errors]
+(((uint32_t) N>=(1UL << (D-1)) && (uint32_t) N<(1UL << D)) ? D : -1)
+             ^
+             ()
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/parameters.h:73:26: error: macro argument should be enclosed in parentheses [bugprone-macro-parentheses,-warnings-as-errors]
+(((uint32_t) N>=(1UL << (D-1)) && (uint32_t) N<(1UL << D)) ? D : -1)
+                         ^
+                         ()
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/parameters.h:73:46: error: macro argument should be enclosed in parentheses [bugprone-macro-parentheses,-warnings-as-errors]
+(((uint32_t) N>=(1UL << (D-1)) && (uint32_t) N<(1UL << D)) ? D : -1)
+                                             ^
+                                             ()
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/parameters.h:73:56: error: macro argument should be enclosed in parentheses [bugprone-macro-parentheses,-warnings-as-errors]
+(((uint32_t) N>=(1UL << (D-1)) && (uint32_t) N<(1UL << D)) ? D : -1)
+                                                       ^
+                                                       ()
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/parameters.h:73:62: error: macro argument should be enclosed in parentheses [bugprone-macro-parentheses,-warnings-as-errors]
+(((uint32_t) N>=(1UL << (D-1)) && (uint32_t) N<(1UL << D)) ? D : -1)
+                                                             ^
+                                                             ()
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/parameters.h:76:4: error: macro argument should be enclosed in parentheses [bugprone-macro-parentheses,-warnings-as-errors]
+  (N == 0 ? 1 : (15                                     \
+   ^
+   ()
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/parameters.h:96:61: error: macro argument should be enclosed in parentheses [bugprone-macro-parentheses,-warnings-as-errors]
+#define LOG2(L) ( (BITS_TO_REPRESENT(L) > BITS_TO_REPRESENT(L-1)) ? (BITS_TO_REPRESENT(L-1)) : (BITS_TO_REPRESENT(L)) )
+                                                            ^
+                                                            ()
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/parameters.h:96:88: error: macro argument should be enclosed in parentheses [bugprone-macro-parentheses,-warnings-as-errors]
+#define LOG2(L) ( (BITS_TO_REPRESENT(L) > BITS_TO_REPRESENT(L-1)) ? (BITS_TO_REPRESENT(L-1)) : (BITS_TO_REPRESENT(L)) )
+                                                                                       ^
+                                                                                       ()
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/restr_arith.h:32:34: error: macro argument should be enclosed in parentheses [bugprone-macro-parentheses,-warnings-as-errors]
+#define FZ_DOUBLE_ZERO_NORM(x) ((x + ((x + 1) >> 3)) & 0x07)
+                                 ^
+                                 ()
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/restr_arith.h:32:40: error: macro argument should be enclosed in parentheses [bugprone-macro-parentheses,-warnings-as-errors]
+#define FZ_DOUBLE_ZERO_NORM(x) ((x + ((x + 1) >> 3)) & 0x07)
+                                       ^
+                                       ()
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/seedtree.h:28:1: error: #includes are not sorted properly [llvm-include-order,-warnings-as-errors]
+#include "parameters.h"
+^        ~~~~~~~~~~~~~~
+         "csprng_hash.h"
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/sha3.h:38:18: error: Value stored to 'val' is never read [clang-analyzer-deadcode.DeadStores,-warnings-as-errors]
+   if(val == 0) {val = 0;};
+                 ^     ~
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/sha3.h:38:18: note: Value stored to 'val' is never read
+   if(val == 0) {val = 0;};
+                 ^     ~
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/CROSS.c:25:1: error: #includes are not sorted properly [llvm-include-order,-warnings-as-errors]
+#include <assert.h>
+^        ~~~~~~~~~~
+         "CROSS.h"
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/csprng_hash.c:26:1: error: #includes are not sorted properly [llvm-include-order,-warnings-as-errors]
+#include <string.h>
+^        ~~~~~~~~~~
+         "csprng_hash.h"
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/merkle.c:34:32: error: macro argument should be enclosed in parentheses [bugprone-macro-parentheses,-warnings-as-errors]
+#define SIBLING(i) ( ((i)%2) ? i+1 : i-1 )
+                               ^
+                               ()
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/merkle.c:34:38: error: macro argument should be enclosed in parentheses [bugprone-macro-parentheses,-warnings-as-errors]
+#define SIBLING(i) ( ((i)%2) ? i+1 : i-1 )
+                                     ^
+                                     ()
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/merkle.c:36:16: error: macro argument should be enclosed in parentheses [bugprone-macro-parentheses,-warnings-as-errors]
+#define RL(i) (i==1 ? r_node : l_node)
+               ^
+               ()
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/merkle.c:279:85: error: statement should be inside braces [google-readability-braces-around-statements,readability-braces-around-statements,-warnings-as-errors]
+        if ( (flag_tree[i] == NOT_COMPUTED) && (flag_tree[SIBLING(i)] == COMPUTED) )
+                                                                                    ^
+                                                                                     {
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/pack_unpack.c:26:1: error: #includes are not sorted properly [llvm-include-order,-warnings-as-errors]
+#include <stdint.h>
+^        ~~~~~~~~~~
+         <stddef.h>
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/pack_unpack.c:322:18: error: statement should be inside braces [readability-braces-around-statements,-warnings-as-errors]
+   if(inlen == 0) inlen = 0;
+                 ^
+                  {
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/pack_unpack.c:322:19: error: Value stored to 'inlen' is never read [clang-analyzer-deadcode.DeadStores,-warnings-as-errors]
+   if(inlen == 0) inlen = 0;
+                  ^       ~
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/pack_unpack.c:322:19: note: Value stored to 'inlen' is never read
+   if(inlen == 0) inlen = 0;
+                  ^       ~
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/pack_unpack.c:557:7: error: Value stored to 'skip' is never read [clang-analyzer-deadcode.DeadStores,-warnings-as-errors]
+      skip = 0;
+      ^      ~
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/pack_unpack.c:557:7: note: Value stored to 'skip' is never read
+      skip = 0;
+      ^      ~
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/pack_unpack.c:675:7: error: Value stored to 'skip' is never read [clang-analyzer-deadcode.DeadStores,-warnings-as-errors]
+      skip = 0;
+      ^      ~
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/pack_unpack.c:675:7: note: Value stored to 'skip' is never read
+      skip = 0;
+      ^      ~
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/seedtree.c:30:26: error: macro argument should be enclosed in parentheses [bugprone-macro-parentheses,-warnings-as-errors]
+#define LEFT_CHILD(i) (2*i+1)
+                         ^
+                         ()
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/seedtree.c:31:27: error: macro argument should be enclosed in parentheses [bugprone-macro-parentheses,-warnings-as-errors]
+#define RIGHT_CHILD(i) (2*i+2)
+                          ^
+                          ()
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/seedtree.c:32:21: error: macro argument should be enclosed in parentheses [bugprone-macro-parentheses,-warnings-as-errors]
+#define PARENT(i) ((i-1)/2)
+                    ^
+                    ()
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/seedtree.c:37:30: error: macro argument should be enclosed in parentheses [bugprone-macro-parentheses,-warnings-as-errors]
+#define DIV_BY_TWO_CEIL(i)  (i/2 + i % 2)
+                             ^
+                             ()
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/seedtree.c:37:36: error: macro argument should be enclosed in parentheses [bugprone-macro-parentheses,-warnings-as-errors]
+#define DIV_BY_TWO_CEIL(i)  (i/2 + i % 2)
+                                   ^
+                                   ()
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/seedtree.c:43:6: error: the value returned by this function should be used [cert-err33-c,-warnings-as-errors]
+     fprintf(stderr,"-");
+     ^~~~~~~~~~~~~~~~~~~
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/seedtree.c:43:6: note: cast the expression to void to silence this warning
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/seedtree.c:45:6: error: the value returned by this function should be used [cert-err33-c,-warnings-as-errors]
+     fprintf(stderr,"%02X", seed[i]);
+     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/seedtree.c:45:6: note: cast the expression to void to silence this warning
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/seedtree.c:47:6: error: the value returned by this function should be used [cert-err33-c,-warnings-as-errors]
+     fprintf(stderr,"- ");
+     ^~~~~~~~~~~~~~~~~~~~
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/seedtree.c:47:6: note: cast the expression to void to silence this warning
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/seedtree.c:52:4: error: the value returned by this function should be used [cert-err33-c,-warnings-as-errors]
+   fprintf(stderr,"Tree dump\n");
+   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/seedtree.c:52:4: note: cast the expression to void to silence this warning
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/seedtree.c:55:7: error: the value returned by this function should be used [cert-err33-c,-warnings-as-errors]
+      fprintf(stderr,"level %d ", level);
+      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/seedtree.c:55:7: note: cast the expression to void to silence this warning
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/seedtree.c:59:11: error: the value returned by this function should be used [cert-err33-c,-warnings-as-errors]
+          fprintf(stderr," [%d] ",node_idx);
+          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/seedtree.c:59:11: note: cast the expression to void to silence this warning
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/seedtree.c:63:7: error: the value returned by this function should be used [cert-err33-c,-warnings-as-errors]
+      fprintf(stderr,"\n");
+      ^~~~~~~~~~~~~~~~~~~~
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/seedtree.c:63:7: note: cast the expression to void to silence this warning
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/seedtree.c:65:4: error: the value returned by this function should be used [cert-err33-c,-warnings-as-errors]
+   fprintf(stderr,"\n");
+   ^~~~~~~~~~~~~~~~~~~~
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/seedtree.c:65:4: note: cast the expression to void to silence this warning
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/sign.c:118:19: error: statement should be inside braces [readability-braces-around-statements,-warnings-as-errors]
+   if(siglen == 0) siglen = 0;
+                  ^
+                   {
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/sign.c:118:20: error: Value stored to 'siglen' is never read [clang-analyzer-deadcode.DeadStores,-warnings-as-errors]
+   if(siglen == 0) siglen = 0;
+                   ^        ~
+/home/marcoxps/Documents/tesi/pqc/fork_pqclean/3-tidy/PQClean/test/../crypto_sign/cross-rsdp-128-balanced/avx2/sign.c:118:20: note: Value stored to 'siglen' is never read
+   if(siglen == 0) siglen = 0;
+                   ^        ~
+
+============================== 2 failed in 24.55s ==============================

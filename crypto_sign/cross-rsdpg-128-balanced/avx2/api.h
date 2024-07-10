@@ -23,14 +23,12 @@
  *
  **/
 
-#pragma once
-
 #ifndef PQCLEAN_CROSSRSDPG128BALANCED_AVX2_API_H
 #define PQCLEAN_CROSSRSDPG128BALANCED_AVX2_API_H
 
-#include <stdint.h>
+#pragma once
 
-// TODO: CRYPTO_ALGNAME, CRYPTO_SECRETKEYBYTES, CRYPTO_PUBLICKEYBYTES, CRYPTO_BYTES, CRYPTO_RANDOMBYTES
+#include <stdint.h>
 
 #define PQCLEAN_CROSSRSDPG128BALANCED_AVX2_CRYPTO_ALGNAME "cross-rsdpg-128-balanced"
 
@@ -46,37 +44,36 @@
 /* required bytes of input randomness */
 #define PQCLEAN_CROSSRSDPG128BALANCED_AVX2_CRYPTO_RANDOMBYTES 16
 
-
 int PQCLEAN_CROSSRSDPG128BALANCED_AVX2_crypto_sign_keypair(unsigned char *pk,
-                        unsigned char *sk
-                       );
+        unsigned char *sk
+                                                          );
 
 int PQCLEAN_CROSSRSDPG128BALANCED_AVX2_crypto_sign(unsigned char *sm,
-                uint64_t *smlen,
-                const unsigned char *m,
-                uint64_t mlen,
-                const unsigned char *sk
-               );
+        uint64_t *smlen,
+        const unsigned char *m,
+        uint64_t mlen,
+        const unsigned char *sk
+                                                  );
 
 int PQCLEAN_CROSSRSDPG128BALANCED_AVX2_crypto_sign_open(unsigned char *m,
-                     uint64_t *mlen,
-                     const unsigned char *sm,
-                     uint64_t smlen,
-                     const unsigned char *pk
-                    );
+        uint64_t *mlen,
+        const unsigned char *sm,
+        uint64_t smlen,
+        const unsigned char *pk
+                                                       );
 
 int PQCLEAN_CROSSRSDPG128BALANCED_AVX2_crypto_sign_signature(unsigned char *sig,
-                uint64_t *siglen,
-                const unsigned char *m,
-                uint64_t mlen,
-                const unsigned char *sk
-               );
+        uint64_t *siglen,
+        const unsigned char *m,
+        uint64_t mlen,
+        const unsigned char *sk
+                                                            );
 
 int PQCLEAN_CROSSRSDPG128BALANCED_AVX2_crypto_sign_verify(const unsigned char *sig,
-                uint64_t siglen,
-                const unsigned char *m,
-                uint64_t mlen,
-                const unsigned char *pk
-               );
-               
+        uint64_t siglen,
+        const unsigned char *m,
+        uint64_t mlen,
+        const unsigned char *pk
+                                                         );
+
 #endif

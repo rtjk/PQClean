@@ -24,62 +24,53 @@
  **/
 #pragma once
 
-#include "parameters.h"
-#include "pack_unpack.h"
 #include <stdint.h>
+
+#include "pack_unpack.h"
+#include "parameters.h"
 
 /* Public key: the parity check matrix is shrunk to a seed, syndrome
  * represented in full */
 typedef struct {
-   uint8_t seed_pub[KEYPAIR_SEED_LENGTH_BYTES];
-   uint8_t s[DENSELY_PACKED_FQ_SYN_SIZE];
+	uint8_t seed_pub[KEYPAIR_SEED_LENGTH_BYTES];
+	uint8_t s[DENSELY_PACKED_FQ_SYN_SIZE];
 } pubkey_t;
 
 /* Private key: just a single seed*/
 typedef struct {
-   uint8_t seed[KEYPAIR_SEED_LENGTH_BYTES];
+	uint8_t seed[KEYPAIR_SEED_LENGTH_BYTES];
 } prikey_t;
 
 typedef struct {
-  uint8_t y[DENSELY_PACKED_FQ_VEC_SIZE];
-#if defined(RSDP)
-  uint8_t sigma[DENSELY_PACKED_FZ_VEC_SIZE];
-#elif defined(RSDPG)
-  uint8_t delta[DENSELY_PACKED_FZ_RSDP_G_VEC_SIZE];
-#endif
+	uint8_t y[DENSELY_PACKED_FQ_VEC_SIZE];
+	uint8_t sigma[DENSELY_PACKED_FZ_VEC_SIZE];
 } rsp_0_t;
 
 /* Signature: */
 typedef struct {
-   uint8_t salt[SALT_LENGTH_BYTES];
-   uint8_t digest_01[HASH_DIGEST_LENGTH];
-   uint8_t digest_b[HASH_DIGEST_LENGTH];
-#if defined(NO_TREES)   
-   uint8_t stp[W*SEED_LENGTH_BYTES];
-   uint8_t mtp[W*HASH_DIGEST_LENGTH];
-#else
-   /*Seed tree paths storage*/
-   uint8_t stp[TREE_NODES_TO_STORE*SEED_LENGTH_BYTES];
-   /*Merkle tree proof field.*/
-   uint8_t mtp[HASH_DIGEST_LENGTH*TREE_NODES_TO_STORE];
-#endif
-   rsp_0_t rsp_0[T-W];
-   uint8_t rsp_1[T-W][HASH_DIGEST_LENGTH];
+	uint8_t salt[SALT_LENGTH_BYTES];
+	uint8_t digest_01[HASH_DIGEST_LENGTH];
+	uint8_t digest_b[HASH_DIGEST_LENGTH];
+	/*Seed tree paths storage*/
+	uint8_t stp[TREE_NODES_TO_STORE * SEED_LENGTH_BYTES];
+	/*Merkle tree proof field.*/
+	uint8_t mtp[HASH_DIGEST_LENGTH * TREE_NODES_TO_STORE];
+	rsp_0_t rsp_0[T - W];
+	uint8_t rsp_1[T - W][HASH_DIGEST_LENGTH];
 } sig_t;
-
 
 /* keygen cannot fail */
 void PQCLEAN_CROSSRSDP256BALANCED_CLEAN_CROSS_keygen(prikey_t *SK,
-                 pubkey_t *PK);
+        pubkey_t *PK);
 
 /* sign cannot fail */
-void PQCLEAN_CROSSRSDP256BALANCED_CLEAN_CROSS_sign(const prikey_t * const SK,
-                const char * const m,
-                const uint64_t mlen,
-                sig_t * const sig);
+void PQCLEAN_CROSSRSDP256BALANCED_CLEAN_CROSS_sign(const prikey_t *SK,
+        const char *m,
+        uint64_t mlen,
+        sig_t *sig);
 
 /* verify returns 1 if signature is ok, 0 otherwise */
-int PQCLEAN_CROSSRSDP256BALANCED_CLEAN_CROSS_verify(const pubkey_t * const PK,
-                 const char * const m,
-                 const uint64_t mlen,
-                 const sig_t * const sig);
+int PQCLEAN_CROSSRSDP256BALANCED_CLEAN_CROSS_verify(const pubkey_t *PK,
+        const char *m,
+        uint64_t mlen,
+        const sig_t *sig);
